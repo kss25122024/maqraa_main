@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-e5sm05)n7onhekdwc-wiugi6kve&iap1ikkqjbiy4_t^s&@gmi
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -98,8 +98,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'maqraa_db',                  # <--- يجب أن يتطابق مع الاسم الذي أنشأته
-        'USER': 'root',                       # <--- بما أنك تستخدم root
-        'PASSWORD': 'Ab258000#@', # <--- استبدل بكلمة مرور root الحقيقية في MySQL
+        'USER': 'mohammed',                       # <--- بما أنك تستخدم root
+        'PASSWORD': 'Mohammed@Mohammed2022', # <--- استبدل بكلمة مرور root الحقيقية في MySQL
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
