@@ -1,0 +1,65 @@
+
+{% load static %}
+    <div class="col-md-10 right-section d-flex justify-content-center flex-column mx-auto" style="background-color: var(--tp-grey-1); padding: 30px; border-radius: 10px;">
+        <h2 class="text-center">إحصائيات</h2>
+        <div class="stat-container">
+            <div class="stat-item">
+                <span class="stat-title">عدد الحلقات</span>
+                <div class="stat-box" id="stat-halaqat">
+                    <span class="stat-number" data-target="{{ total_halaqat }}">0</span>
+                    <!-- Placeholder for icon -->
+                    <i class="stat-icon fas fa-book-open"></i>
+                </div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-title">عدد الطلاب</span>
+                <div class="stat-box" id="stat-students">
+                    <span class="stat-number" data-target="{{ total_students }}">{{ total_students }}</span>
+                    <!-- Placeholder for icon -->
+                    <i class="stat-icon fas fa-users"></i>
+                </div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-title">عدد الآيات</span>
+                <div class="stat-box" id="stat-ayat">
+                    <span class="stat-number" data-target="{{ total_memorized_ayat }}">0</span>
+                    <!-- Placeholder for icon -->
+                    <i class="stat-icon fas fa-quran"></i>
+                </div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-title">عدد الصفحات</span>
+                <div class="stat-box" id="stat-pages">
+                    <span class="stat-number" data-target="{{ total_pages_and_parts }}">0</span>
+                    <!-- Placeholder for icon -->
+                    <i class="stat-icon fas fa-file-alt"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const statNumbers = document.querySelectorAll('.stat-number');
+
+        statNumbers.forEach(stat => {
+            const updateCount = () => {
+                const target = +stat.getAttribute('data-target');
+                const count = +stat.innerText;
+
+                const increment = target / 100;
+
+                if (count < target) {
+                    stat.innerText = Math.ceil(count + increment);
+                    setTimeout(updateCount, 20);
+                } else {
+                    stat.innerText = target;
+                }
+            };
+
+            updateCount();
+        });
+    </script>
+
+    
+</body>

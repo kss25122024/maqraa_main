@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>دردشة الأدمن والطالب/المدرس</title>
+    <style>
+        .message {
+            margin-bottom: 10px;
+        }
+        .sender {
+            font-weight: bold;
+        }
+        .content {
+            margin-left: 20px;
+        }
+        .info {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>دردشة الأدمن والطالب/المدرس</h1>
+        {% if student %}
+            <p>الطالب: {{ student.first_name }} {{ student.second_name }} {{ student.last_name }}</p>
+        {% endif %}
+        {% if teacher %}
+            <p>المدرس: {{ teacher.first_name }} {{ teacher.second_name }} {{ teacher.last_name }}</p>
+        {% endif %}
+        {% if admin %}
+            <p>الأدمن: {{ admin.first_name }} {{ admin.second_name }} {{ admin.last_name }}</p>
+        {% endif %}
+    </div>
+    <div id="chat-box">
+        {% for message in messages %}
+            <div class="message">
+                {% if message.sender == request.user %}
+                    <p class="sender">أنت:</p>
+                {% else %}
+                    <p class="sender">{{ message.sender.username }}:</p>
+                {% endif %}
+                <p class="content">{{ message.content }}</p>
+            </div>
+        {% endfor %}
+    </div>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">إرسال</button>
+    </form>
+</body>
+</html>

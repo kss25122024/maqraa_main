@@ -1,0 +1,34 @@
+{% include 'parts/header.html' %}
+{% load static %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="card text-center shadow-lg">
+                <div class="card-body">
+                    <h2 class="card-title text-success">تم التسجيل بنجاح!</h2>
+                    <p class="card-text">تم إنشاء حساب المعلم الخاص بك بنجاح.</p>
+                    <p class="card-text">سيتم التواصل معك لاحقا </p>
+                    <p class="card-text text-success">   يمكن التواصل معنا من خلال النقر على رمز الواتس اب الظاهر على الشاشة  </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'parts/footer.html' %}
+<!-- WhatsApp Floating Icon -->
+    <a href="https://wa.me/00967784252107" class="whatsapp-icon" target="_blank"> <!-- Replace 00967784252107 with the actual WhatsApp number -->
+        <img src="{% static 'icons/whatsapp.png' %}" alt="WhatsApp"> <!-- Ensure whatsapp.png exists in static/icons/ -->
+    </a>

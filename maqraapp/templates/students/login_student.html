@@ -1,0 +1,55 @@
+{% include 'parts/header.html' %}
+
+{% load static %}
+
+
+ 
+
+    <div class="container " style="background-color: #dcd3c1;">
+        <div class="row align-items-center" style="min-height: 50vh;">
+            <div class="col-md-6">
+                <img src="{% static 'img/logo/4-1.jpg' %}" class="img-fluid" alt="صورة">
+            </div>
+            <div class="col-md-6">
+                <div class="card" style="background-color: #ebe3d3;">
+                    <div class="card-body ">
+                        <h5 class="card-title text-center">تسجيل دخول الطالب </h5>
+                        <form method="post">
+                            {% csrf_token %} 
+                            <div class="form-group">
+                                <label for="username">اسم المستخدم</label>
+                                <input type="username" class="form-control" style="background-color: #f9f9d1;" id="email" name="email" placeholder="أدخل الايميل" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">كلمة المرور</label>
+                                <input type="password" class="form-control" style="background-color: #f9f9d1;" name="password" id="password" placeholder="أدخل كلمة المرور" required>
+                            </div>
+                            <br>
+                            <div class="text-center">
+                                <button type="submit" class="btn fs-6" style="background-color:#ac9c80;">تسجيل الدخول</button>
+                            </div>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'register_student' %}" class="btn" style="background-color:#ac9c80;">إنشاء حساب</a>
+                            </div>
+                        </form>
+
+                        {% if messages %}
+    <ul>
+    {% for message in messages %}
+        <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'parts/footer.html' %}
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script src="js/bootstrap.js"></script>
+</body>
+
+</html>

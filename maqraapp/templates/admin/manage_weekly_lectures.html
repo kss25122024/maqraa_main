@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة المحاضرات الأسبوعية</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        /* Add any specific styles for weekly lectures management here */
+        .header {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .header {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .header {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'parts/header.html' %}
+
+    <div class="header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>إدارة المحاضرات الأسبوعية</h1>
+        </div>
+        <div>
+            <a href="{% url 'add_weekly_lecture' %}" class="btn btn-success">إضافة محاضرة</a>
+            <a href="#" class="btn btn-warning edit-lecture-btn">تعديل محاضرة</a>
+            <a href="#" class="btn btn-danger delete-lecture-btn">حذف محاضرة</a>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">العودة للوحة التحكم</a>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-4 lecture-list">
+                <h2>قائمة المحاضرات الأسبوعية</h2>
+                <ul class="list-group">
+                    {% for lecture in weekly_lectures %}
+                    <li class="list-group-item">
+                        <input type="checkbox" name="selected_lectures" value="{{ lecture.id }}">
+                        <a href="{% url 'lecture_detail' lecture.id %}">{{ lecture.title }}</a>
+                    </li>
+                    {% empty %}
+                    <li class="list-group-item">لا توجد محاضرات أسبوعية متاحة.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-8 lecture-details">
+                <h2>تفاصيل المحاضرة</h2>
+                <div id="lecture-details-content">
+                    {# Lecture details will be loaded here when a lecture is clicked #}
+                    <p>الرجاء اختيار محاضرة من القائمة لعرض تفاصيلها.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'parts/footer.html' %}
+
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script>
+        // Add JavaScript here to handle clicking on lecture titles
+        // and loading the details in the lecture-details-content div
+
+        document.querySelector('.btn-warning').addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default anchor behavior
+
+            const checkboxes = document.querySelectorAll('input[name="selected_lectures"]:checked');
+            if (checkboxes.length === 0) {
+                alert('الرجاء تحديد محاضرة لتعديلها.'); // Please select a lecture to edit.
+            } else if (checkboxes.length > 1) {
+                 alert('الرجاء تحديد محاضرة واحدة فقط لتعديلها.'); // Please select only one lecture to edit.
+            }
+            else {
+                const lectureId = checkboxes[0].value;
+                // Assuming the URL pattern for editing is 'edit_weekly_lecture/<int:lecture_id>/'
+                window.location.href = `/weekly_lectures/edit/${lectureId}/`;
+            }
+        });
+
+        document.querySelector('.delete-lecture-btn').addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default anchor behavior
+            console.log('Delete button clicked'); // Log button click
+
+            const checkboxes = document.querySelectorAll('input[name="selected_lectures"]:checked');
+            if (checkboxes.length === 0) {
+                alert('الرجاء تحديد محاضرة لحذفها.'); // Please select a lecture to delete.
+                console.log('No lecture selected for deletion.'); // Log no selection
+            } else if (checkboxes.length > 1) {
+                 alert('الرجاء تحديد محاضرة واحدة فقط لحذفها.'); // Please select only one lecture to delete.
+                 console.log('Multiple lectures selected for deletion.'); // Log multiple selection
+            }
+            else {
+                const lectureId = checkboxes[0].value;
+                console.log('Lecture selected for deletion:', lectureId); // Log selected ID
+                if (confirm('هل أنت متأكد من حذف هذه المحاضرة؟')) { // Are you sure you want to delete this lecture?
+                    console.log('User confirmed deletion.'); // Log confirmation
+                    // Send AJAX request to delete the lecture
+                    fetch(`/manage/weekly_lectures/${lectureId}/delete/`, { // Updated URL pattern to /manage/
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}', // Include CSRF token
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ lecture_id: lectureId })
+                    })
+                    .then(response => {
+                        console.log('Fetch response received:', response); // Log fetch response
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Response data:', data); // Log response data
+                        if (data.message === 'تم الحذف بنجاح!') {
+                            alert('تم الحذف بنجاح!'); // Deleted successfully!
+                            window.location.reload(); // Reload the page to update the list
+                        } else {
+                            alert('حدث خطأ أثناء الحذف: ' + data.message); // Error during deletion
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error during fetch:', error); // Log fetch error
+                        alert('حدث خطأ أثناء الحذف.'); // Generic error message
+                    });
+                } else {
+                    console.log('User cancelled deletion.'); // Log cancellation
+                }
+            }
+        });
+    </script>
+</body>
+</html>

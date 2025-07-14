@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة الطلاب</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        /* Add any specific styles for student management here */
+        .header {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .action-buttons {
+            margin-bottom: 20px;
+        }
+        .action-buttons .btn {
+            margin-right: 10px;
+        }
+    </style>
+    <style type="text/css" media="print">
+        @page {
+            size: A4;
+        }
+        /* Hide elements that should not be printed */
+        body > *:not(header):not(.container) {
+            display: none !important;
+        }
+        .container > .row > .col-md-3, /* Hide the buttons column */
+        .container > .row > .col-md-9 > .mb-3, /* Hide the search form */
+        .container > .row > .col-md-9 > .card > .card-body > h2:not(#studentTableContainer h2), /* Hide other h2 elements if any, keep the table title */
+        .text-center.mt-3, /* Hide the footer text within the table container */
+        .modal, /* Hide modals */
+        .modal-backdrop, /* Hide modal backdrops */
+        footer /* Hide the footer */
+         {
+            display: none !important;
+        }
+
+        /* Ensure header and table container are displayed */
+        header,
+        #studentTableContainer {
+            display: block !important;
+            position: relative !important;
+            width: 100% !important;
+            margin: 0 !important; /* Remove margins */
+            padding: 0 !important; /* Remove padding */
+            overflow: visible !important; /* Ensure content is not hidden */
+            height: auto !important; /* Remove fixed height */
+        }
+
+        /* Ensure the logo and table title are displayed */
+        header .navbar-brand img { /* Target the logo image specifically */
+             display: block !important;
+             margin: 0 auto 20px auto !important; /* Center logo and add space below */
+        }
+         #studentTableContainer h2 { /* Target the table title */
+             display: block !important;
+             text-align: center !important; /* Center table title */
+             margin-bottom: 20px !important;
+        }
+
+
+        /* Ensure table and its contents are displayed correctly */
+        #studentTableContainer table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin-top: 20px !important; /* Add space above the table */
+        }
+        #studentTableContainer thead {
+            display: table-header-group !important; /* Ensure table header is displayed */
+        }
+        #studentTableContainer tbody {
+            display: table-row-group !important; /* Ensure table body is displayed */
+        }
+        #studentTableContainer tr {
+            display: table-row !important; /* Ensure rows are displayed */
+            page-break-inside: avoid !important; /* Prevent page breaks inside rows */
+        }
+        #studentTableContainer th,
+        #studentTableContainer td {
+            border: 1px solid #ddd !important;
+            padding: 8px !important;
+            display: table-cell !important; /* Ensure cells are displayed */
+        }
+        #studentTableContainer th {
+            background-color: #f2f2f2 !important;
+            text-align: right !important; /* Adjust text alignment for RTL */
+        }
+    </style>
+<style type="text/css" media="print">
+        @page {
+            size: A4;
+            margin: 1cm; /* Add some margin for printing */
+        }
+        body > *:not(#printableArea) {
+            display: none !important;
+        }
+        #printableArea {
+            display: block !important;
+            position: relative !important;
+            width: 100% !important;
+            padding: 0 !important; /* Remove padding from printable area */
+            margin: 0 !important; /* Remove margin from printable area */
+        }
+        header {
+            display: block !important;
+            position: relative !important;
+            width: 100% !important;
+            margin-bottom: 20px !important;
+        }
+        header .navbar-brand img {
+             display: block !important;
+             margin: 0 auto 20px auto !important;
+        }
+        #studentTableContainer {
+            display: block !important;
+            position: relative !important;
+            width: 100% !important;
+            margin-top: 20px !important;
+        }
+        #studentTableContainer h2 {
+             display: block !important;
+             text-align: center !important;
+             margin-bottom: 20px !important;
+        }
+        #studentTableContainer table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+        }
+        #studentTableContainer th,
+        #studentTableContainer td {
+            border: 1px solid #ddd !important;
+            padding: 8px !important;
+            display: table-cell !important;
+        }
+        #studentTableContainer th {
+            background-color: #f2f2f2 !important;
+            text-align: right !important;
+        }
+        #studentTableContainer thead {
+            display: table-header-group !important;
+        }
+        #studentTableContainer tbody {
+            display: table-row-group !important;
+        }
+        #studentTableContainer tr {
+            display: table-row !important;
+            page-break-inside: avoid !important;
+        }
+        /* Hide elements within the printable area that should not be printed */
+        #printableArea .header:not(.navbar-top), /* Hide the page header but not the top navbar with logo */
+        #printableArea .col-md-3, /* Hide the buttons column */
+        #printableArea .mb-3 form, /* Hide the search form */
+        #printableArea .text-center.mt-3 /* Hide the footer text */
+         {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="printableArea">
+    {% include 'parts/header.html' %}
+
+    <div class="header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>إدارة الطلاب</h1>
+        </div>
+        <div>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">العودة للوحة التحكم</a>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Buttons Column -->
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-grid gap-2 action-buttons">
+                            <!-- Import Students Button -->
+                            <!-- Import Students Button -->
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#importStudentModal">استيراد طلاب من ملف اكسل</button>
+<!-- Download Template Button -->
+                            <a href="{% url 'generate_student_template' %}" class="btn btn-secondary">تحميل نموذج ملف الاكسل</a>
+                            <!-- Add Student Button -->
+                           <a href="{% url 'add_student' %}" class="btn btn-success">إضافة طالب</a>
+                           <!-- Edit Student Button -->
+                           <button class="btn btn-warning" id="editStudentBtn" data-bs-toggle="modal" data-bs-target="#selectStudentModal">تعديل طالب</button>
+                           <!-- Delete Student Button -->
+                           <button class="btn btn-danger" id="delete-student-btn">حذف طالب</button>
+                           <!-- Print Button -->
+                           <button class="btn btn-info" id="printButton">طباعة</button>
+                           <!-- Export to Excel Button -->
+                           <button class="btn btn-secondary" id="exportExcelBtn">تصدير إلى اكسل</button>
+                           <!-- Back Button -->
+                           <a href="{% url 'admin_dashboard' %}" class="btn btn-dark">العودة</a>
+                       </div>
+                   </div>
+               </div>
+           </div>
+           <!-- Student Table Column -->
+           <div class="col-md-9">
+               <div class="mb-3">
+                   <form method="get" action=".">
+                      <div class="input-group">
+                          <input type="text" class="form-control" placeholder="ابحث عن طالب..." name="q">
+                          <button class="btn btn-outline-secondary" type="submit">بحث</button>
+                      </div>
+                  </form>
+              </div>
+              <div class="card">
+                   <div class="card-body">
+                       <h2>قائمة الطلاب</h2>
+                       <div class="table-responsive" id="studentTableContainer">
+                           <table class="table table-striped">
+                               <thead>
+                                   <tr>
+                                       <th>تحديد</th>
+                                       <th>الاسم الأول</th>
+                                       <th>الاسم الثاني</th>
+                                       <th>الاسم الأخير</th>
+                                       <th>تاريخ الميلاد</th>
+                                       <th>الجنسية</th>
+                                       <th>الجنس</th>
+                                       <th>البريد الإلكتروني</th>
+                                       <th>اللغة</th>
+                                       <th>رقم الجوال</th>
+                                       <th>رقم الواتساب</th>
+                                       <th>اسم المستخدم</th>
+                                       <!-- Add other basic student fields as needed -->
+                                   </tr>
+                               </thead>
+                               <tbody>
+                                   {% for student in students %}
+                                   <tr>
+                                       <td><input type="checkbox" name="selected_students" value="{{ student.id }}"></td>
+                                       <td>{{ student.first_name }}</td>
+                                       <td>{{ student.second_name }}</td>
+                                       <td>{{ student.last_name }}</td>
+                                       <td>{{ student.birthday }}</td>
+                                       <td>{{ student.nationality }}</td>
+                                       <td>{{ student.gender }}</td>
+                                       <td>{{ student.email }}</td>
+                                       <td>{{ student.language }}</td>
+                                       <td>{{ student.mobile }}</td>
+                                       <td>{{ student.whatsapp }}</td>
+                                       <td>{{ student.username }}</td>
+                                       <!-- Add other basic student fields as needed -->
+                                   </tr>
+                                   {% endfor %}
+                               </tbody>
+                           </table>
+<div class="text-center mt-3">
+    <p>© الخوارزمي للحلول الذكية</p>
+</div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+   </div>
+   </div> <!-- Closing printableArea div -->
+
+   <!-- Select Student Modal -->
+   <div class="modal fade" id="selectStudentModal" tabindex="-1" aria-labelledby="selectStudentModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <h5 class="modal-title" id="selectStudentModalLabel">تحديد طالب للتعديل</h5>
+                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                   يرجى تحديد طالب واحد من القائمة لتعديله.
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                   <button type="button" class="btn btn-primary" id="confirmEditStudentBtn">تعديل الطالب المحدد</button>
+               </div>
+           </div>
+       </div>
+   </div>
+
+   <!-- Select Student Modal for Deletion (Message Only) -->
+   <div class="modal fade" id="deleteStudentSelectModal" tabindex="-1" aria-labelledby="deleteStudentSelectModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <h5 class="modal-title" id="deleteStudentSelectModalLabel">تحديد طالب للحذف</h5>
+                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body" id="deleteStudentSelectModalBody">
+                   {# Message will be set by JavaScript #}
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+               </div>
+           </div>
+       </div>
+   </div>
+
+   <!-- Modal for confirming student deletion -->
+   <div class="modal fade" id="deleteStudentConfirmModal" tabindex="-1" aria-labelledby="deleteStudentConfirmModalLabel" aria-hidden="true">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <h5 class="modal-title" id="deleteStudentConfirmModalLabel">تأكيد حذف الطالب</h5>
+                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                   <p>هل أنت متأكد أنك تريد حذف الطالب: <strong id="studentNameToDelete"></strong>؟</p>
+                   <input type="hidden" id="studentIdToDelete">
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                   <button type="button" class="btn btn-danger" id="confirmDeleteStudent">حذف</button>
+               </div>
+           </div>
+       </div>
+   </div>
+
+  <!-- Import Student Modal -->
+  <div class="modal fade" id="importStudentModal" tabindex="-1" aria-labelledby="importStudentModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="importStudentModalLabel">استيراد طلاب من ملف اكسل</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form action="{% url 'import_students' %}" method="post" enctype="multipart/form-data" id="importStudentForm">
+                      {% csrf_token %}
+                      <div class="mb-3">
+                          <label for="excel_file" class="form-label">اختر ملف الاكسل:</label>
+                          <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".xls,.xlsx" required>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                          <button type="submit" class="btn btn-primary">استيراد</button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  {% include 'parts/footer.html' %}
+
+  <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+  <script>
+      $(document).ready(function() {
+          // Handle edit student button click
+          $('#editStudentBtn').on('click', function() {
+              const modal = new bootstrap.Modal(document.getElementById('selectStudentModal'));
+              const modalBody = $('#selectStudentModal .modal-body');
+              const confirmButton = $('#confirmEditStudentBtn');
+              const selectedStudents = $('input[name="selected_students"]:checked');
+
+              // Always show the modal
+              modal.show();
+
+              // Update modal content based on initial selection
+              if (selectedStudents.length === 0) {
+                  modalBody.text('يرجى تحديد طالب واحد من القائمة لتعديله.');
+                  confirmButton.prop('disabled', true); // Disable button if no student selected
+              } else if (selectedStudents.length === 1) {
+                  modalBody.text('يرجى تحديد طالب واحد من القائمة لتعديله.');
+                  confirmButton.prop('disabled', false); // Enable button if one student selected
+              } else {
+                  modalBody.text('لقد حددت أكثر من طالب واحد. يرجى تحديد طالب واحد فقط لتعديله.');
+                  confirmButton.prop('disabled', true); // Disable button if multiple students selected
+              }
+          });
+
+          // Handle confirm edit student button click inside the modal
+          $('#confirmEditStudentBtn').on('click', function() {
+              const selectedStudents = $('input[name="selected_students"]:checked');
+              if (selectedStudents.length === 1) {
+                  const studentId = selectedStudents.val();
+                  console.log('Selected student ID:', studentId); // Log the selected student ID
+                  const redirectUrl = `/edit_student/${studentId}/`; // Assuming the URL pattern is /edit_student/<int:student_id>/
+                  console.log('Redirecting to:', redirectUrl); // Log the redirection URL
+                  window.location.href = redirectUrl;
+              } else {
+                  console.log('Confirm button clicked, but no student or multiple students selected.'); // Log if confirmation happens without a single selection
+              }
+          });
+
+          // Add event listener to checkboxes to enable/disable confirm button
+          $('input[name="selected_students"]').on('change', function() {
+              const selectedStudents = $('input[name="selected_students"]:checked');
+              const confirmButton = $('#confirmEditStudentBtn');
+              const modalBody = $('#selectStudentModal .modal-body');
+
+              if (selectedStudents.length === 1) {
+                  confirmButton.prop('disabled', false);
+                  modalBody.text('يرجى تحديد طالب واحد من القائمة لتعديله.'); // Reset text if it was changed
+              } else if (selectedStudents.length > 1) {
+                  confirmButton.prop('disabled', true);
+                  modalBody.text('لقد حددت أكثر من طالب واحد. يرجى تحديد طالب واحد فقط لتعديله.');
+              } else {
+                  confirmButton.prop('disabled', true);
+                  modalBody.text('يرجى تحديد طالب واحد من القائمة لتعديله.');
+              }
+          });
+
+
+          // Add event listener for modal hidden event
+          $('#selectStudentModal').on('hidden.bs.modal', function () {
+              // Manually remove the modal backdrop
+              $('.modal-backdrop').remove();
+              // Ensure body scrolling is re-enabled
+              $('body').removeClass('modal-open');
+              $('body').css('overflow', '');
+          });
+
+
+      // Handle delete student button click
+      $('#delete-student-btn').on('click', function() {
+          const selectedStudents = $('input[name="selected_students"]:checked');
+          const deleteStudentSelectModal = new bootstrap.Modal(document.getElementById('deleteStudentSelectModal'));
+          const deleteStudentSelectModalBody = $('#deleteStudentSelectModalBody');
+          const deleteStudentConfirmModal = new bootstrap.Modal(document.getElementById('deleteStudentConfirmModal'));
+          const studentIdToDelete = document.getElementById('studentIdToDelete');
+          const studentNameToDelete = document.getElementById('studentNameToDelete');
+
+          if (selectedStudents.length === 0) {
+              deleteStudentSelectModalBody.text('يرجى تحديد طالب واحد من القائمة لحذفه.');
+              deleteStudentSelectModal.show();
+          } else if (selectedStudents.length > 1) {
+              deleteStudentSelectModalBody.text('لقد حددت أكثر من طالب واحد. يرجى تحديد طالب واحد فقط لحذفه.');
+              deleteStudentSelectModal.show();
+          } else {
+              // Exactly one student selected, proceed to confirmation
+              const studentId = selectedStudents[0].value;
+              // Find the student name from the table row
+              const studentRow = selectedStudents[0].closest('tr');
+              const studentName = studentRow.querySelector('td:nth-child(2)').innerText + ' ' + studentRow.querySelector('td:nth-child(4)').innerText; // Assuming first and last name are in 2nd and 4th columns
+
+              studentIdToDelete.value = studentId;
+              studentNameToDelete.innerText = studentName.trim();
+
+              deleteStudentConfirmModal.show();
+          }
+      });
+
+      // Handle student deletion
+      const confirmDeleteStudentButton = document.getElementById('confirmDeleteStudent');
+      confirmDeleteStudentButton.addEventListener('click', function() {
+          const studentId = studentIdToDelete.value;
+
+          // Send a POST request to the delete URL
+          fetch(`/delete_student/${studentId}/`, { // This URL needs to be created in urls.py
+              method: 'POST',
+              headers: {
+                  'X-CSRFToken': getCookie('csrftoken'), // Include CSRF token
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ student_id: studentId })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.message) {
+                  alert(data.message);
+                  // Reload the page or remove the deleted item from the DOM
+                  location.reload(); // Simple reload for now
+              } else if (data.error) {
+                  alert('حدث خطأ: ' + data.error);
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              alert('حدث خطأ أثناء حذف الطالب.');
+          });
+      });
+
+      // Handle print button click
+      $('#printButton').on('click', function() {
+          window.print();
+      });
+
+  }); // Added the missing closing }); for $(document).ready()
+
+      // Function to get CSRF token (assuming it's needed and not already present)
+      function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  // Does this cookie string begin with the name we want?
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+
+// Handle export to Excel button click
+    $('#exportExcelBtn').on('click', function() {
+        console.log('Export to Excel button clicked'); // Log button click
+        const table = $('#studentTableContainer table');
+        let data = [];
+        const headers = [];
+
+        // Extract headers
+        table.find('thead th').each(function() {
+            headers.push($(this).text().trim());
+        });
+        console.log('Extracted headers:', headers); // Log headers
+
+        // Extract rows
+        table.find('tbody tr').each(function() {
+            let rowData = {};
+            $(this).find('td').each(function(index) {
+                // Skip the first column (checkbox)
+                if (index > 0) {
+                    rowData[headers[index]] = $(this).text().trim();
+                }
+            });
+            data.push(rowData);
+        });
+        console.log('Extracted student data:', data); // Log extracted data
+
+        // Send data to the server
+        fetch('/maqraapp_admin/export_students_excel/', { // This URL needs to be created in urls.py
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+            },
+            body: JSON.stringify({ students: data })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob(); // Get the response as a Blob
+        })
+        .then(blob => {
+            // Create a link element, set the download attribute and click it
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'students_report.xlsx'; // Set the desired file name
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url); // Clean up the URL object
+        })
+        .catch(error => {
+            console.error('Error exporting data:', error);
+            alert('حدث خطأ أثناء تصدير البيانات.');
+        });
+    });
+// Handle export to Excel button click
+    $('#exportExcelBtn').on('click', function() {
+        const table = $('#studentTableContainer table');
+        let data = [];
+        const headers = [];
+
+        // Extract headers
+        table.find('thead th').each(function() {
+            headers.push($(this).text().trim());
+        });
+
+        // Extract rows
+        table.find('tbody tr').each(function() {
+            let rowData = {};
+            $(this).find('td').each(function(index) {
+                // Skip the first column (checkbox)
+                if (index > 0) {
+                    rowData[headers[index]] = $(this).text().trim();
+                }
+            });
+            data.push(rowData);
+        });
+
+        // Send data to the server
+        fetch('/admin/export_students_excel/', { // This URL needs to be created in urls.py
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+            },
+            body: JSON.stringify({ students: data })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.blob(); // Get the response as a Blob
+        })
+        .then(blob => {
+            // Create a link element, set the download attribute and click it
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'students_report.xlsx'; // Set the desired file name
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url); // Clean up the URL object
+        })
+        .catch(error => {
+            console.error('Error exporting data:', error);
+            alert('حدث خطأ أثناء تصدير البيانات.');
+        });
+    });
+  </script>
+ <script src="{% static 'js/bootstrap-bundle.js' %}"></script>
+  <script>
+      // Check if Bootstrap is loaded
+      if (typeof bootstrap !== 'undefined') {
+          console.log('Bootstrap is loaded successfully.');
+      } else {
+          console.error('Bootstrap is not loaded.');
+      }
+  </script>
+</body>
+</html>

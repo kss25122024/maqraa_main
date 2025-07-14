@@ -1,0 +1,288 @@
+{% include 'parts/header.html' %}
+{% load static %}
+<style>
+    body {
+        background-color: #f8f9fa; /* Light gray background */
+    }
+
+    .register-container {
+        background-color: #dcd3c1; /* Container background color */
+        border-radius: 10px;
+        padding: 30px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .register-card {
+        background-color: #ffffff; /* Card background color */
+        border: none;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .register-card-title {
+        color: #007bff; /* Primary color for title */
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        font-weight: 500;
+        color: #343a40; /* Dark gray for labels */
+    }
+
+    .form-control {
+        border-radius: 5px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+
+    .whatsapp-icon {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 1000;
+    }
+
+    .whatsapp-icon img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 767.98px) {
+        .register-container {
+            padding: 20px;
+        }
+
+        .register-card {
+            margin-top: 20px;
+        }
+
+        .whatsapp-icon {
+            bottom: 10px;
+            left: 10px;
+        }
+
+        .whatsapp-icon img {
+            width: 40px;
+            height: 40px;
+        }
+    }
+</style>
+
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="container register-container">
+    <div class="row align-items-center" style="min-height: 50vh;">
+        <div class="col-md-5 mb-4 mb-md-0 text-center">
+            <img src="{% static 'img/logo/ترحيب المقرأة.jpg' %}" class="img-fluid rounded" alt="صورة">
+        </div>
+        <div class="col-md-7">
+            <div class="card register-card">
+                <div class="card-body">
+                    <h5 class="card-title text-center register-card-title">إنشاء حساب طالب</h5>
+
+                    <form method="post" enctype="multipart/form-data" onsubmit="return validateStudentForm()">
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <!-- Name Section -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.first_name.id_for_label }}">الاسم الأول</label>
+                                    {{ form.first_name }}
+                                    {% for error in form.first_name.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.second_name.id_for_label }}">الاسم الثاني</label>
+                                    {{ form.second_name }}
+                                    {% for error in form.second_name.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.last_name.id_for_label }}">اللقب</label>
+                                    {{ form.last_name }}
+                                    {% for error in form.last_name.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.email.id_for_label }}">الإيميل</label>
+                                    {{ form.email }}
+                                    {% for error in form.email.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.mobile.id_for_label }}">رقم الجوال</label>
+                                    {{ form.mobile }}
+                                    {% for error in form.mobile.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.whatsapp.id_for_label }}">رقم الواتس</label>
+                                    {{ form.whatsapp }}
+                                    {% for error in form.whatsapp.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+  
+                        <!-- Personal Information -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.gender.id_for_label }}">الجنس</label>
+                                    {{ form.gender }}
+                                    {% for error in form.gender.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.birthday.id_for_label }}">تاريخ الميلاد</label>
+                                    {{ form.birthday }}
+                                    {% for error in form.birthday.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.nationality.id_for_label }}">الجنسية</label>
+                                    {{ form.nationality }}
+                                    {% for error in form.nationality.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                             
+                        </div>
+  
+                        <!-- Language -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.language.id_for_label }}">اللغات التي تعرفها</label>
+                                    {{ form.language }}
+                                    {% for error in form.language.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+  
+                        <!-- Account Details - Username -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.username.id_for_label }}">اسم المستخدم</label>
+                                    {{ form.username }}
+                                    {% if form.username.errors %}
+                                        <div class="text-danger">
+                                            {% for error in form.username.errors %}
+                                                <p>{{ error }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Account Details - Password -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.password.id_for_label }}">كلمة المرور</label>
+                                    {{ form.password }}
+                                    {% for error in form.password.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-group">
+                                    <label for="{{ form.confirm_password.id_for_label }}">تأكيد كلمة المرور</label>
+                                    {{ form.confirm_password }}
+                                    {% for error in form.confirm_password.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+  
+                        <!-- Submit Button -->
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">تسجيل</button>
+                        </div>
+                    </form>
+                    </div>
+           </div>
+       </div>
+   </div>
+ 
+   {# Removed validateStudentForm script #}
+ 
+   <!-- WhatsApp Floating Icon -->
+   <a href="https://wa.me/00967784252107" class="whatsapp-icon" target="_blank"> <!-- Replace 00967784252107 with the actual WhatsApp number -->
+       <img src="{% static 'icons/whatsapp.png' %}" alt="WhatsApp"> <!-- Ensure whatsapp.png exists in static/icons/ -->
+   </a>
+ </div>
+ 
+ {{ form.media }} {# Include form media for widgets #}
+ 
+ {# Keep existing script includes #}
+ <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+ <script src="{% static 'js/popper.min.js' %}"></script>
+ <script src="{% static 'js/bootstrap.js' %}"></script>

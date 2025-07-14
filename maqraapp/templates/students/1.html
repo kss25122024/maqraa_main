@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تفاصيل الحلقة</title>
+    {% include 'parts/header.html' %}
+    {% load static %}
+    <style>
+        .halaqa-icon {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            text-align: center;
+            width: 100px;
+            height: 100px;
+            line-height: 70px;
+            transition: background-color 0.3s ease;
+        }
+        .halaqa-icon:hover {
+            background-color: #c0c0c0;
+        }
+        .halaqa-link {
+            text-decoration: none;
+            color: #000;
+        }
+        .hidden {
+            display: none;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>مرحباً: {{ teacher.first_name }} {{ teacher.last_name }}</h1>
+        </div>
+        <div>
+            <a href="{% url 'logout' %}" class="btn btn-secondary">تسجيل الخروج</a>
+        </div>
+    </div>
+
+    <div class="row mt-4 bg-light">
+        <div class="col-6">
+            <h3>نافذة التواصل</h3>
+            <div class="container mt-5">
+                <button class="btn btn-primary" id="chat-teacher-btn">تواصل مع الأستاذ</button>
+            </div>
+            <div class="chat-window" id="chat-teacher-window">
+                <div class="chat-header">
+                    <span>دردشة مع الأستاذ</span>
+                </div>
+                <div class="chat-body" id="chat-teacher-body">
+                    <!-- رسائل الدردشة ستظهر هنا -->
+                </div>
+                <div class="chat-footer">
+                    <input type="text" class="form-control" id="chat-teacher-input" placeholder="اكتب رسالتك...">
+                    <button class="btn btn-success" id="chat-teacher-send-btn">إرسال</button>
+                </div>
+            </div>
+            <script>
+                document.getElementById('chat-teacher-btn').addEventListener('click', function() {
+                    document.getElementById('chat-teacher-window').style.display = 'block';
+                });
+                
+                document.getElementById('chat-admin-btn').addEventListener('click', function() {
+                    document.getElementById('chat-admin-window').style.display = 'block';
+                });
+                
+                document.addEventListener('click', function(event) {
+                    const chatTeacherWindow = document.getElementById('chat-teacher-window');
+                    const chatAdminWindow = document.getElementById('chat-admin-window');
+                
+                    if (chatTeacherWindow.style.display === 'block' && !chatTeacherWindow.contains(event.target) && event.target.id !== 'chat-teacher-btn') {
+                        chatTeacherWindow.style.display = 'none';
+                    }
+                
+                    if (chatAdminWindow.style.display === 'block' && !chatAdminWindow.contains(event.target) && event.target.id !== 'chat-admin-btn') {
+                        chatAdminWindow.style.display = 'none';
+                    }
+                });
+                
+                document.getElementById('chat-teacher-send-btn').addEventListener('click', function() {
+                    const chatInput = document.getElementById('chat-teacher-input');
+                    const chatBody = document.getElementById('chat-teacher-body');
+                    const message = chatInput.value;
+                
+                    if (message.trim() !== '') {
+                        const messageElement = document.createElement('div');
+                        messageElement.textContent = message;
+                        chatBody.appendChild(messageElement);
+                        chatInput.value = '';
+                    }
+                });
+                
+                document.getElementById('chat-admin-send-btn').addEventListener('click', function() {
+                    const chatInput = document.getElementById('chat-admin-input');
+                    const chatBody = document.getElementById('chat-admin-body');
+                    const message = chatInput.value;
+                
+                    if (message.trim() !== '') {
+                        const messageElement = document.createElement('div');
+                        messageElement.textContent = message;
+                        chatBody.appendChild(messageElement);
+                        chatInput.value = '';
+                    }
+                });
+            </script>
+        </div>
+        
+        <div class="col-6">
+            <h5>قائمة الروابط</h5>
+            <ul class="list-group mb-4 ">
+                <li class="list-group-item "><a href="# ">رابط 1</a></li>
+                <li class="list-group-item "><a href="# ">رابط 2</a></li>
+                <li class="list-group-item "><a href="# ">رابط 3</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- زر العودة في منتصف الصفحة -->
+    <div class="center-button">
+        <a href="{% url 'halaqa_detail' student.halaqa.id %}" class="btn btn-success">عودة</a>
+    </div>
+
+    {% include 'parts/footer.html' %}
+
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+</body>
+</html>

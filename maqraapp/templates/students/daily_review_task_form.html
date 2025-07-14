@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>إضافة مهمة المراجعة اليومية</title>
+    {% include 'parts/header.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        body {
+            direction: rtl;
+            text-align: right;
+        }
+        .center-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header d-flex justify-content-between align-items-center">
+            <div>
+                <h1>مرحباً: {{ user.get_full_name }} </h1>
+            </div>
+            <div>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+                </form>
+            </div>
+        </div>
+        <h2>إضافة مهمة المراجعة اليومية للطالب: {{ student.first_name }} {{ student.last_name }}</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.student.as_hidden }}
+            
+            <div class="form-group">
+                {{ form.ReviewTask.label_tag }}
+                {{ form.ReviewTask }}
+            </div>
+
+            <div class="form-group">
+                {{ form.previous_surah.label_tag }}
+                {{ form.previous_surah }}
+            </div>
+
+            <div class="form-group">
+                {{ form.previous_ayat.label_tag }}
+                {{ form.previous_ayat }}
+            </div>
+
+            <div class="form-group">
+                {{ form.current_surah.label_tag }}
+                {{ form.current_surah }}
+            </div>
+
+            <div class="form-group">
+                {{ form.current_ayat.label_tag }}
+                {{ form.current_ayat }}
+            </div>
+
+            <div class="form-group">
+                {{ form.pages.label_tag }}
+                {{ form.pages }}
+            </div>
+
+            <div class="form-group">
+                {{ form.partial_page.label_tag }}
+                {{ form.partial_page }}
+            </div>
+
+            <div class="form-group">
+                {{ form.grade.label_tag }}
+                {{ form.grade }}
+            </div>
+
+            <div class="form-group">
+                {{ form.date.label_tag }}
+                {{ form.date }}
+            </div>
+
+            <div class="form-group">
+                {{ form.reviewed_ayat_count.label_tag }}
+                {{ form.reviewed_ayat_count }}
+            </div>
+
+            <button type="submit" class="btn btn-primary">حفظ</button>
+        </form>
+
+        <div class="center-button">
+            <a href="javascript:history.back()" class="btn btn-success">عودة</a>
+        </div>
+    </div>
+
+    <!-- تضمين ملفات JavaScript قبل إغلاق وسم body -->
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script src="{% static 'js/7.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const reviewTaskSelect = document.getElementById("id_ReviewTask");
+            const previousSurahSelect = document.getElementById("id_previous_surah");
+            const currentSurahSelect = document.getElementById("id_current_surah");
+
+            reviewTaskSelect.addEventListener("change", function() {
+                const category = this.value;
+                fetch(`/get-surahs/${category}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        previousSurahSelect.innerHTML = "";
+                        currentSurahSelect.innerHTML = "";
+                        data.forEach(surah => {
+                            const option1 = document.createElement("option");
+                            option1.value = surah;
+                            option1.text = surah;
+                            previousSurahSelect.appendChild(option1);
+                            const option2 = document.createElement("option");
+                            option2.value = surah;
+                            option2.text = surah;
+                            currentSurahSelect.appendChild(option2);
+                        });
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

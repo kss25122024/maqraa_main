@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة المدرسين</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        /* Add any specific styles for teacher management here */
+        .container {
+            margin-top: 20px;
+        }
+        .button-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'parts/header.html' %}
+
+    <div class="container">
+        <h1>إدارة المدرسين</h1>
+
+        <div class="row button-container">
+            <div class="col-md-2">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'add_teacher' %}" class="btn btn-success">إضافة مدرس</a>
+                    <button class="btn btn-primary" id="editTeacherBtn">تعديل مدرس</button>
+                    <button class="btn btn-danger" id="deleteTeacherBtn">حذف مدرس</button>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="mb-3">
+                    <input type="text" id="teacherSearch" class="form-control" placeholder="ابحث عن مدرس...">
+                </div>
+                <table class="table table-striped" id="teachersTable">
+                    <thead>
+                        <tr>
+                            <th>الاسم الأول</th>
+                            <th>الاسم الأخير</th>
+                            <th>رقم الواتس اب</th>
+                            <th>اسم المستخدم</th>
+                            <th>المسار</th>
+                            <th>تحديد</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teacher in teachers %}
+                        <tr>
+                            <td>{{ teacher.first_name }}</td>
+                            <td>{{ teacher.last_name }}</td>
+                            <td>{{ teacher.mobile_whatsapp }}</td>
+                            <td>{{ teacher.username }}</td>
+                            <td>{{ teacher.msar_name }}</td>
+                            <td><input type="radio" name="selected_teacher" value="{{ teacher.id }}"></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+             <div class="col-md-2">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-secondary" id="printTeachersBtn">طباعة</button>
+                    <button class="btn btn-info" id="exportTeachersBtn">تصدير إلى اكسل</button>
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">العودة</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {% include 'parts/footer.html' %}
+
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script>
+        $(document).ready(function(){
+            $("#teacherSearch").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#teachersTable tbody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+
+            $("#editTeacherBtn").on("click", function() {
+                var selectedTeacherId = $("input[name='selected_teacher']:checked").val();
+                if (selectedTeacherId) {
+                    // Assuming the URL pattern for editing a teacher is something like '/admin/edit_teacher/<teacher_id>/'
+                    // You might need to adjust the URL based on your Django project's URL configuration
+                    window.location.href = "/edit_teacher/" + selectedTeacherId + "/";
+                } else {
+                    alert("الرجاء تحديد مدرس لتعديله.");
+                }
+            });
+
+            $("#deleteTeacherBtn").on("click", function() {
+                var selectedTeacherId = $("input[name='selected_teacher']:checked").val();
+                if (!selectedTeacherId) {
+                    alert("الرجاء تحديد مدرس لحذفه.");
+                    return;
+                }
+
+                if (confirm("هل أنت متأكد أنك تريد حذف هذا المدرس؟")) {
+                    // Send AJAX request to delete the teacher
+                    // Assuming the URL for deleting a teacher is '/admin/delete_teacher/<teacher_id>/'
+                    // You might need to adjust the URL based on your Django project's URL configuration
+                    $.ajax({
+                        url: "/delete_teacher/" + selectedTeacherId + "/",
+                        type: "POST",
+                        headers: { "X-CSRFToken": "{{ csrf_token }}" }, // Include CSRF token
+                        success: function(response) {
+                            alert(response.message);
+                            location.reload(); // Refresh the page after successful deletion
+                        },
+                        error: function(xhr, status, error) {
+                            var errorMessage = "حدث خطأ أثناء الحذف.";
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                            alert(errorMessage);
+                        }
+                    });
+                }
+            });
+
+            $("#printTeachersBtn").on("click", function() {
+                window.print();
+            });
+$("#exportTeachersBtn").on("click", function() {
+                // Assuming the URL pattern for exporting teachers is '/admin/export_teachers/'
+                // You might need to adjust the URL based on your Django project's URL configuration
+                window.location.href = "{% url 'export_teachers_excel' %}";
+            });
+        });
+    </script>
+</body>
+</html>

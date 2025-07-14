@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة الأقسام</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        /* Add any specific styles for sections page here */
+        .header {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .section-icon {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 10px; /* Slightly rounded corners for icons */
+            text-align: center;
+            width: 120px; /* Increased size for better visibility */
+            height: 120px;
+            line-height: 90px; /* Adjust line height based on new size */
+            transition: background-color 0.3s ease;
+            text-decoration: none; /* Remove underline from link */
+            color: #000; /* Default text color */
+            font-weight: bold;
+        }
+        .section-icon:hover {
+            background-color: #c0c0c0;
+        }
+    </style>
+</head>
+<body>
+    {% include 'parts/header.html' %}
+
+    <div class="header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>إدارة الأقسام</h1>
+        </div>
+        <div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <!-- Navigation Links -->
+                <div class="d-grid gap-2">
+                    <a href="{% url 'add_department' %}" class="btn btn-primary d-block">اضافة قسم</a>
+                    <a href="#" class="btn btn-warning d-block">تعديل قسم</a>
+                    <a href="#" class="btn btn-danger d-block">حذف قسم</a>
+                    <hr> {# Optional separator #}
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary d-block">العودة للوحة التحكم</a>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <!-- Main Content: Sections Icons -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h2>الأقسام الموجودة</h2>
+                        <p>هنا سيتم عرض ايقونات للأقسام الموجودة.</p>
+                        <!-- Display sections from the database -->
+                        <div class="mt-4">
+                            {% for department in departments %}
+                            <div class="section-icon">
+                                <div>{{ department.name }}</div>
+                                <input type="checkbox" name="selected_departments" value="{{ department.id }}">
+                            </div>
+                            {% empty %}
+                            <p>لا توجد أقسام لعرضها.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'parts/footer.html' %}
+
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editButton = document.querySelector('.btn-warning'); // Assuming the edit button is the warning button
+            editButton.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default link behavior
+
+                const checkboxes = document.querySelectorAll('input[name="selected_departments"]:checked');
+
+                if (checkboxes.length === 0) {
+                    alert('الرجاء تحديد قسم واحد لتعديله.');
+                } else if (checkboxes.length > 1) {
+                    alert('الرجاء تحديد قسم واحد فقط لتعديله.');
+                } else {
+                    const departmentId = checkboxes[0].value;
+                    // Redirect to the edit department page with the selected department ID
+                    window.location.href = `/edit_department/${departmentId}/`; // Assuming your URL pattern is /edit_department/<int:department_id>/
+                }
+            });
+
+            const deleteButton = document.querySelector('.btn-danger'); // Assuming the delete button is the danger button
+            deleteButton.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent default link behavior
+
+                const checkboxes = document.querySelectorAll('input[name="selected_departments"]:checked');
+
+                if (checkboxes.length === 0) {
+                    alert('الرجاء تحديد قسم واحد لحذفه.');
+                } else if (checkboxes.length > 1) {
+                    alert('الرجاء تحديد قسم واحد فقط لحذفه.');
+                } else {
+                    const departmentId = checkboxes[0].value;
+                    const departmentName = checkboxes[0].closest('.section-icon').querySelector('div').innerText;
+
+                    if (confirm(`هل أنت متأكد أنك تريد حذف القسم "${departmentName}"؟`)) {
+                        // Send a request to delete the department
+                        fetch(`/delete_department/${departmentId}/`, { // Assuming your URL pattern is /delete_department/<int:department_id>/
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({}) // Send an empty body for POST request
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('تم الحذف بنجاح!');
+                                window.location.reload(); // Reload the page to show updated list
+                            } else {
+                                alert('حدث خطأ أثناء الحذف.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('حدث خطأ أثناء الحذف.');
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

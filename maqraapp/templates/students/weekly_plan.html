@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>الخطة الأسبوعية</title>
+    {% include 'parts/header.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/weekly_plan.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header d-flex justify-content-between align-items-center">
+            <div>
+                <h1>مرحباً: {{ user.get_full_name }} </h1>
+            </div>
+            <div>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="header d-flex justify-content-between align-items-center">
+            <div>
+                <h1>الخطة الأسبوعية للطالب: {{ student.first_name }} {{ student.last_name }}</h1>
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            {# Manually render form fields, excluding the student field #}
+            {% for field in form %}
+                {% if field.name != 'student' %}
+                    <div class="mb-3">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {# Render the hidden student field if it exists (when editing) #}
+                    {{ field }}
+                {% endif %}
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary">حفظ</button>
+        </form>
+
+        <div class="center-button mt-3">
+            <a href="{% url 'student_detail' student.id %}" class="btn btn-secondary">عودة</a>
+        </div>
+    </div>
+
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script>
+        const category_surahs = {
+            "1": ["الفاتحة", "الناس", "الفلق", "الإخلاص", "المسد", "النصر", "الكافرون", "الكوثر", "الماعون", "قريش", "الفيل", "الهمزة", "العصر", "التكاثر", "القارعة", "العاديات", "الزلزلة", "البينة", "القدر", "العلق", "التين", "الشرح", "الضحى", "الليل", "الشمس", "البلد", "الفجر", "الغاشية", "الأعلى", "الطارق", "البروج", "الإنشقاق", "المطففين", "الانفطار", "التكوير", "عبس", "النازعات", "النبأ"],
+            "2": ["المرسلات", "الإنسان", "القيامة", "المدثر", "المزمل", "الجن", "نوح", "المعارج", "الحاقة", "القلم", "الملك", "التحريم", "الطلاق", "التغابن", "المنافقون", "الجمعة", "الصف", "الممتحنة", "الحشر", "المجادلة"],
+            "3": ["الحديد", "الواقعة", "الرحمن", "القمر", "النجم", "الطور", "الذاريات", "ق", "الحجرات", "الفتح", "محمد", "الأحقاف"],
+            "4": ["الجاثية", "الدخان", "الزخرف", "الشورى", "فصلت", "غافر", "الزمر", "ص", "الصافات", "يس", "فاطر", "سبأ", "الأحزاب", "السجدة", "لقمان", "الروم"],
+            "5": ["العنكبوت", "القصص", "النمل", "الشعراء", "الفرقان", "النور", "المؤمنون", "الحج", "الأنبياء", "طه", "مريم"],
+            "6": ["الكهف", "الإسراء", "النحل", "الحجر", "إبراهيم", "الرعد", "يوسف", "هود", "يونس"],
+            "7": ["التوبة", "الأنفال", "الأعراف", "الأنعام", "المائدة", "النساء", "آل عمران", "البقرة"]
+        };
+
+        const ayatCounts = {
+            "الفاتحة": 7, "البقرة": 286, "آل عمران": 200, "النساء": 176, "المائدة": 120, "الأنعام": 165, "الأعراف": 206, "الأنفال": 75, "التوبة": 129, "يونس": 109, "هود": 123, "يوسف": 111, "الرعد": 43, "إبراهيم": 52, "الحجر": 99, "النحل": 128, "الإسراء": 111, "الكهف": 110, "مريم": 98, "طه": 135, "الأنبياء": 112, "الحج": 78, "المؤمنون": 118, "النور": 64, "الفرقان": 77, "الشعراء": 227, "النمل": 93, "القصص": 88, "العنكبوت": 69, "الروم": 60, "لقمان": 34, "السجدة": 30, "الأحزاب": 73, "سبأ": 54, "فاطر": 45, "يس": 83, "الصافات": 182, "ص": 88, "الزمر": 75, "غافر": 85, "فصلت": 54, "الشورى": 53, "الزخرف": 89, "الدخان": 59, "الجاثية": 37, "الأحقاف": 35, "محمد": 38, "الفتح": 29, "الحجرات": 18, "ق": 45, "الذاريات": 60, "الطور": 49, "النجم": 62, "القمر": 55, "الرحمن": 78, "الواقعة": 96, "الحديد": 29, "المجادلة": 22, "الحشر": 24, "الممتحنة": 13, "الصف": 14, "الجمعة": 11, "المنافقون": 11, "التغابن": 18, "الطلاق": 12, "التحريم": 12,             "الملك": 30, "القلم": 52, "الحاقة": 52, "المعارج": 44, "نوح": 28, "الجن": 28, "المزمل": 20, "المدثر": 56, "القيامة": 40, "الإنسان": 31, "المرسلات": 50, "النبأ": 40, "النازعات": 46, "عبس": 42, "التكوير": 29, "الانفطار": 19, "المطففين": 36, "الانشقاق": 25, "البروج": 22, "الطارق": 17, "الأعلى": 19, "الغاشية": 26, "الفجر": 30, "البلد": 20, "الشمس": 15, "الليل": 21, "الضحى": 11, "الشرح": 8, "التين": 8, "العلق": 19, "القدر": 5, "البينة": 8, "الزلزلة": 8, "العاديات": 11, "القارعة": 11, "التكاثر": 8, "العصر": 3, "الهمزة": 9, "الفيل": 5, "قريش": 4, "الماعون": 7, "الكوثر": 3, "الكافرون": 6, "النصر": 3, "المسد": 5, "الإخلاص": 4, "الفلق": 5, "الناس": 6
+        };
+
+
+        function updateSurahs(taskType) {
+            const categorySelect = document.getElementById(`id_${taskType}_task`);
+            const previousSurahSelect = document.getElementById(`id_${taskType}_previous_surah`);
+            const currentSurahSelect = document.getElementById(`id_${taskType}_current_surah`);
+            const selectedCategory = categorySelect.value;
+
+            // Clear existing options
+            previousSurahSelect.innerHTML = '<option value="">-- اختر سورة --</option>';
+            currentSurahSelect.innerHTML = '<option value="">-- اختر سورة --</option>';
+
+            if (selectedCategory) {
+                const surahs = category_surahs[selectedCategory] || [];
+                surahs.forEach(surah => {
+                    const option1 = document.createElement('option');
+                    option1.value = surah;
+                    option1.textContent = surah;
+                    previousSurahSelect.appendChild(option1);
+
+                    const option2 = document.createElement('option');
+                    option2.value = surah;
+                    option2.textContent = surah;
+                    currentSurahSelect.appendChild(option2);
+                });
+            }
+             updateAyats(taskType, 'previous');
+             updateAyats(taskType, 'current');
+        }
+
+        function updateAyats(taskType, surahType) {
+            const surahSelect = document.getElementById(`id_${taskType}_${surahType}_surah`);
+            const ayatSelect = document.getElementById(`id_${taskType}_${surahType}_ayat`);
+            const selectedSurah = surahSelect.value;
+
+            // Clear existing options
+            ayatSelect.innerHTML = '<option value="">-- اختر آية --</option>';
+
+            if (selectedSurah) {
+                const ayatCount = ayatCounts[selectedSurah] || 0;
+                for (let i = 1; i <= ayatCount; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i;
+                    ayatSelect.appendChild(option);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial update on page load
+            updateSurahs('memorization');
+            updateSurahs('review');
+            updateSurahs('talqeen');
+
+            // Add event listeners
+            document.getElementById('id_memorization_task').addEventListener('change', () => updateSurahs('memorization'));
+            document.getElementById('id_memorization_previous_surah').addEventListener('change', () => updateAyats('memorization', 'previous'));
+            document.getElementById('id_memorization_current_surah').addEventListener('change', () => updateAyats('memorization', 'current'));
+
+            document.getElementById('id_review_task').addEventListener('change', () => updateSurahs('review'));
+            document.getElementById('id_review_previous_surah').addEventListener('change', () => updateAyats('review', 'previous'));
+            document.getElementById('id_review_current_surah').addEventListener('change', () => updateAyats('review', 'current'));
+
+            document.getElementById('id_talqeen_task').addEventListener('change', () => updateSurahs('talqeen'));
+            document.getElementById('id_talqeen_previous_surah').addEventListener('change', () => updateAyats('talqeen', 'previous'));
+            document.getElementById('id_talqeen_current_surah').addEventListener('change', () => updateAyats('talqeen', 'current'));
+        });
+        </script>
+    <!-- WhatsApp Floating Icon -->
+    <a href="https://wa.me/00967784252107" class="whatsapp-icon" target="_blank"> <!-- Replace 00967784252107 with the actual WhatsApp number -->
+        <img src="{% static 'icons/whatsapp.png' %}" alt="WhatsApp"> <!-- Ensure whatsapp.png exists in static/icons/ -->
+    </a>
+    </body>
+
+</html>

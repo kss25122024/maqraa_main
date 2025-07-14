@@ -1,0 +1,196 @@
+{% load static %}
+{% include 'parts/header.html' %}
+
+{% block title %}تقرير طالب{% endblock %}
+
+{% block content %}
+<style>
+    @media print {
+        footer {
+            display: none !important;
+        }
+        .hide-on-print {
+            display: none !important;
+        }
+        .hide-on-print {
+            display: none !important;
+        }
+        .report-table-title, .report-table {
+            /* page-break-before: always; */ /* Removed to allow sequential printing */
+        }
+        .report-table-title:first-child {
+            page-break-before: auto;
+        }
+    }
+</style>
+<button class="btn btn-secondary" onclick="history.back()">Back</button>
+<div class="container mt-4">
+    <script>
+        document.getElementById('export-excel').addEventListener('click', function() {
+            const studentSelect = document.getElementById('student');
+            const fromDateInput = document.getElementById('from_date');
+            const toDateInput = document.getElementById('to_date');
+
+            const studentId = studentSelect.value;
+            const fromDate = fromDateInput.value || 'None'; // Use 'None' if date is not selected
+            const toDate = toDateInput.value || 'None'; // Use 'None' if date is not selected
+
+            console.log('Student ID:', studentId);
+            console.log('From Date:', fromDate);
+            console.log('To Date:', toDate);
+
+
+            if (!studentId) {
+                alert('Please select a student first.');
+                return;
+            }
+
+            // Construct the URL for the export view
+            const exportUrl = `/student_report_single/export/excel/${studentId}/${fromDate}/${toDate}/`;
+            console.log('Export URL:', exportUrl);
+
+            // Navigate to the URL to trigger the download
+            window.location.href = exportUrl;
+        });
+    </script>
+    <h2 class="text-center mb-4">تقرير طالب</h2>
+
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="student">اسم الطالب:</label>
+                    <select class="form-control" id="student" name="student">
+                        <option value="">اختر طالب</option>
+                        {% for student in students %}
+                            <option value="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="from_date">من تاريخ:</label>
+                    <input type="date" class="form-control" id="from_date" name="from_date">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="to_date">الى تاريخ:</label>
+                    <input type="date" class="form-control" id="to_date" name="to_date">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary mt-4 hide-on-print">عرض التقرير</button>
+            </div>
+             <div class="col-md-2">
+                <button type="button" class="btn btn-info mt-4 hide-on-print" onclick="window.print()">طباعة</button>
+            </div>
+             <div class="col-md-2">
+                <button type="button" class="btn btn-success mt-4 hide-on-print" id="export-excel">تصدير إلى Excel</button>
+            </div>
+        </div>
+    </form>
+
+    {% if report_data %}
+        <h3 class="report-table-title">جدول الحفظ</h3>
+        <table class="table report-table">
+            <thead>
+                <tr>
+                    <th>التاريخ</th>
+                    <th>الفئة</th>
+                    <th>السورة (من)</th>
+                    <th>الآية (من)</th>
+                    <th>السورة (إلى)</th>
+                    <th>الآية (إلى)</th>
+                    <th>عدد الآيات</th>
+                    <th>عدد الصفحات</th>
+                    <th>أجزاء الصفحة</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in report_data.memorization %}
+                    <tr>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.MemorizationTask }}</td>
+                        <td>{{ item.previous_surah }}</td>
+                        <td>{{ item.previous_ayat }}</td>
+                        <td>{{ item.current_surah }}</td>
+                        <td>{{ item.current_ayat }}</td>
+                        <td>{{ item.memorized_ayat_count }}</td>
+                        <td>{{ item.pages }}</td>
+                        <td>{{ item.partial_page }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3 class="report-table-title">جدول المراجعة</h3>
+        <table class="table report-table">
+            <thead>
+                <tr>
+                    <th>التاريخ</th>
+                    <th>الفئة</th>
+                    <th>السورة (من)</th>
+                    <th>الآية (من)</th>
+                    <th>السورة (إلى)</th>
+                    <th>الآية (إلى)</th>
+                    <th>عدد الآيات</th>
+                    <th>عدد الصفحات</th>
+                    <th>أجزاء الصفحة</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in report_data.review %}
+                    <tr>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.ReviewTask }}</td>
+                        <td>{{ item.previous_surah }}</td>
+                        <td>{{ item.previous_ayat }}</td>
+                        <td>{{ item.current_surah }}</td>
+                        <td>{{ item.current_ayat }}</td>
+                        <td>{{ item.reviewed_ayat_count }}</td>
+                        <td>{{ item.pages }}</td>
+                        <td>{{ item.partial_page }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3 class="report-table-title">جدول التلقين</h3>
+        <table class="table report-table">
+            <thead>
+                <tr>
+                    <th>التاريخ</th>
+                    <th>الفئة</th>
+                    <th>السورة (من)</th>
+                    <th>الآية (من)</th>
+                    <th>السورة (إلى)</th>
+                    <th>الآية (إلى)</th>
+                    <th>عدد الآيات</th>
+                    <th>عدد الصفحات</th>
+                    <th>أجزاء الصفحة</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in report_data.dictation %}
+                    <tr>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.TalqeenTask }}</td>
+                        <td>{{ item.previous_surah }}</td>
+                        <td>{{ item.previous_ayat }}</td>
+                        <td>{{ item.current_surah }}</td>
+                        <td>{{ item.current_ayat }}</td>
+                        <td>{{ item.memorized_ayat_count }}</td>
+                        <td>{{ item.pages }}</td>
+                        <td>{{ item.partial_page }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}
+
+<p class="text-center mt-4">© الخوارزمي للحلول الذكية</p>
+{% include 'parts/footer.html' %}

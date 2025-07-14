@@ -1,0 +1,174 @@
+{% load static %}
+{% include 'parts/header.html' %}
+
+{% block title %}تقرير الحلقات{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">تقرير الحلقات</h2>
+    <a href="{% url 'manage_report' %}" class="btn btn-secondary mb-3">العودة</a>
+    <form method="get" id="halaqaReportForm" class="no-print">
+        <div class="form-row align-items-end">
+            <div class="form-group col-md-4">
+                <label for="halaqa_select">اختر الحلقة:</label>
+                <select id="halaqa_select" name="halaqa_id" class="form-control">
+                    <option value="">-- اختر حلقة --</option>
+                    {% for halaqa in halaqat %}
+                        <option value="{{ halaqa.id }}" {% if selected_halaqa and halaqa.id == selected_halaqa.id %}selected{% endif %}>{{ halaqa.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="from_date">من تاريخ:</label>
+                <input type="date" id="from_date" name="from_date" class="form-control" value="{{ from_date|date:'Y-m-d' }}">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="to_date">إلى تاريخ:</label>
+                <input type="date" id="to_date" name="to_date" class="form-control" value="{{ to_date|date:'Y-m-d' }}">
+            </div>
+            <div class="form-group col-md-2">
+                <button type="submit" class="btn btn-primary">عرض التقرير</button>
+            </div>
+        </div>
+    </form>
+
+    {% if selected_halaqa %}
+    <h3 class="mt-4">تقرير الحلقة: {{ selected_halaqa.name }}</h3>
+
+    <h4>جدول الحفظ</h4>
+    {% if memorization_records %}
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>الطالب</th>
+                <th>التاريخ</th>
+                <th>الفئة</th>
+                <th>من سورة</th>
+                <th>آية</th>
+                <th>إلى سورة</th>
+                <th>آية</th>
+                <th>عدد الصفحات</th>
+                <th>جزء من صفحة</th>
+                <th>الدرجة</th>
+                <th>عدد الآيات المحفوظة</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in memorization_records %}
+            <tr>
+                <td>{{ record.student.first_name }} {{ record.student.last_name }}</td>
+                <td>{{ record.date }}</td>
+                <td>{{ record.get_MemorizationTask_display }}</td>
+                <td>{{ record.previous_surah }}</td>
+                <td>{{ record.previous_ayat }}</td>
+                <td>{{ record.current_surah }}</td>
+                <td>{{ record.current_ayat }}</td>
+                <td>{{ record.pages }}</td>
+                <td>{{ record.partial_page }}</td>
+                <td>{{ record.grade }}</td>
+                <td>{{ record.memorized_ayat_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>لا توجد سجلات حفظ لهذه الحلقة في الفترة المحددة.</p>
+    {% endif %}
+
+    <h4>جدول المراجعة</h4>
+    {% if review_records %}
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>الطالب</th>
+                <th>التاريخ</th>
+                <th>الفئة</th>
+                <th>من سورة</th>
+                <th>آية</th>
+                <th>إلى سورة</th>
+                <th>آية</th>
+                <th>عدد الصفحات</th>
+                <th>جزء من صفحة</th>
+                <th>الدرجة</th>
+                <th>عدد الآيات المراجعة</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in review_records %}
+            <tr>
+                <td>{{ record.student.first_name }} {{ record.student.last_name }}</td>
+                <td>{{ record.date }}</td>
+                <td>{{ record.get_ReviewTask_display }}</td>
+                <td>{{ record.previous_surah }}</td>
+                <td>{{ record.previous_ayat }}</td>
+                <td>{{ record.current_surah }}</td>
+                <td>{{ record.current_ayat }}</td>
+                <td>{{ record.pages }}</td>
+                <td>{{ record.partial_page }}</td>
+                <td>{{ record.grade }}</td>
+                <td>{{ record.reviewed_ayat_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>لا توجد سجلات مراجعة لهذه الحلقة في الفترة المحددة.</p>
+    {% endif %}
+
+    <h4>جدول التلقين</h4>
+    {% if talqeen_records %}
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>الطالب</th>
+                <th>التاريخ</th>
+                <th>الفئة</th>
+                <th>من سورة</th>
+                <th>آية</th>
+                <th>إلى سورة</th>
+                <th>آية</th>
+                <th>عدد الصفحات</th>
+                <th>جزء من صفحة</th>
+                <th>الدرجة</th>
+                <th>عدد الآيات الملقنة</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in talqeen_records %}
+            <tr>
+                <td>{{ record.student.first_name }} {{ record.student.last_name }}</td>
+                <td>{{ record.date }}</td>
+                <td>{{ record.get_TalqeenTask_display }}</td>
+                <td>{{ record.previous_surah }}</td>
+                <td>{{ record.previous_ayat }}</td>
+                <td>{{ record.current_surah }}</td>
+                <td>{{ record.current_ayat }}</td>
+                <td>{{ record.pages }}</td>
+                <td>{{ record.partial_page }}</td>
+                <td>{{ record.grade }}</td>
+                <td>{{ record.memorized_ayat_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>لا توجد سجلات تلقين لهذه الحلقة في الفترة المحددة.</p>
+    {% endif %}
+
+    {% endif %}
+
+    {% if selected_halaqa %}
+    <div class="row mt-4 no-print">
+        <div class="col-md-6">
+            <button class="btn btn-secondary" onclick="window.print()">طباعة التقرير</button>
+        </div>
+        <div class="col-md-6 text-right">
+            <a href="{% url 'export_halaqa_report_excel' selected_halaqa.id %}?from_date={{ from_date|date:'Y-m-d' }}&to_date={{ to_date|date:'Y-m-d' }}" class="btn btn-success">تصدير إلى Excel</a>
+            <a href="{% url 'manage_report' %}" class="btn btn-secondary">العودة</a>
+        </div>
+    </div>
+{% endif %}
+</div>
+{% endblock %}
+
+{% include 'parts/footer.html' %}

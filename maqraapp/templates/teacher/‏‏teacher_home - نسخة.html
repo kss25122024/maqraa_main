@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>صفحة المدرس</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <style>
+        .card {
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+        body {
+            direction: rtl;
+            text-align: right;
+            background-color: #ddd4c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="background-color: #ede9de;">
+    <div class="container">
+        <div class="header d-flex justify-content-between align-items-center">
+            
+            <div class="dropdown" id="profileDropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button">
+                ⬤
+           
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="draft-teacher-regester.html">تعديل البيانات الشخصية</a>
+                    <a class="dropdown-item" href="draft-login.html">تسجيل الخروج</a>
+                </div>
+            </button>
+            </div>
+            <h1>مرحباً: {{ teacher.name }}</h1>
+            <div class="student-info">
+                <img src="{{ teacher.photo.url }}" alt="صورة المدرس">
+            </div>
+        </div>
+
+
+        <!-- نوافذ المسارات -->
+        <div id="tracks" class="row">
+            <div class="col-md-4">
+                <div class="card" onclick="showHalaqat('track1')" style="background-color: #ece2c5;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{teacher.group}}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card" onclick="showHalaqat('track2')">
+                    <div class="card-body" style="background-color: #d0c7ad;">
+                        <h5 class="card-title">{{teacher.group}}</h5>
+                    </div>
+                </div>
+            </div>
+            <!-- أضف المزيد من المسارات هنا -->
+        </div>
+
+        <!-- نوافذ الحلقات -->
+        <div id="halaqat-track1" class="row hidden">
+            <div class="col-md-4">
+                <div class="card" onclick="showStudents('halaqa1')">
+                    <div class="card-body" style="background-color: #ece2c5;">
+                        <h5 class="card-title">{{teacher.groups.course.0}}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card" onclick="showStudents('halaqa2')">
+                    <div class="card-body" style="background-color: #ece2c5;">
+                        <h5 class="card-title">{{teacher.groups.course.1}}</h5>
+                    </div>
+                </div>
+            </div>
+            <!-- أضف المزيد من الحلقات هنا -->
+        </div>
+        <div id="halaqat-track2" class="row hidden">
+            <div class="col-md-4">
+                <div class="card" onclick="showStudents('halaqa3')" style="background-color: #d0c7ad;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{teacher.groups.course.2}}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card" onclick="showStudents('halaqa4')" style="background-color: #d0c7ad;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{teacher.groups.course.3}}</h5>
+                    </div>
+                </div>
+            </div>
+            <!-- أضف المزيد من الحلقات هنا -->
+        </div>
+
+        <!-- جدول الطلاب -->
+        <div id="students-halaqa1" class="hidden">
+            <h3>{{student.group.0}}</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>اسم الطالب</th>
+                        <th>رقم الطالب</th>
+                        <th>عرض صفحة الطالب</th>
+                        <th>الاتصال بالطالب</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{student.name.0}}</td>
+                        <td>{{student.id.0}}</td>
+                        <td><button class="btn btn-info">عرض صفحة الطالب</button></td>
+                        <td><button class="btn btn-primary">اتصال</button></td>
+                    </tr>
+                    <tr>
+                        <td> {{student.name.1}} </td>
+                        <td>{{student.id.1}}</td>
+                        <td><button class="btn btn-info">عرض صفحة الطالب</button></td>
+                        <td><button class="btn btn-primary">اتصال</button></td>
+                    </tr>
+                    <!-- أضف المزيد من الطلاب هنا -->
+                </tbody>
+            </table>
+        </div>
+        <div id="students-halaqa2" class="hidden">
+            <h3> {{student.group.1}} </h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>اسم الطالب</th>
+                        <th>رقم الطالب</th>
+                        <th>عرض صفحة الطالب</th>
+                        <th>الاتصال بالطالب</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td> {{student.name.2}} </td>
+                        <td>{{student.id.2}}</td>
+                        <td><button class="btn btn-info">عرض صفحة الطالب</button></td>
+                        <td><button class="btn btn-primary">اتصال</button></td>
+                    </tr>
+                    <tr>
+                        <td> {{student.name.3}} </td>
+                        <td>{{student.id.3}}</td>
+                        <td><button class="btn btn-info">عرض صفحة الطالب</button></td>
+                        <td><button class="btn btn-primary">اتصال</button></td>
+                    </tr>
+                    <!-- أضف المزيد من الطلاب هنا -->
+                </tbody>
+            </table>
+        </div>
+        <div id="students-halaqa3" class="hidden">
+            <h3> {{student.group.2}}</h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>اسم الطالب</th>
+                        <th>رقم الطالب</th>
+                        <th>عرض صفحة الطالب</th>
+                        <th>الاتصال بالطالب</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{student.name.4}}</td>
+                        <td>{{student.id.4}}</td>
+                        <td><button class="btn btn-info">عرض صفحة الطالب</button></td>
+                        <td><button class="btn btn-primary">اتصال</button></td>
+                    </tr>
+                    <tr>
+                        <td>{{student.name.5}}</td>
+                        <td>{{student.id.5}}</td>
+                        <td><button class="btn btn-info">عرض صفحة الطالب</button></td>
+                        <td><button class="btn btn-primary">اتصال</button></td>
+                    </tr>
+                    <!-- أضف المزيد من الطلاب هنا -->
+                </tbody>
+            </table>
+        </div>
+        <div id="students-halaqa4" class="hidden">
+            <h3> {{student.group.3}} </h3>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>اسم الطالب</th>
+                        <th>رقم الطالب</th>
+                        <th>عرض صفحة الطالب</th>
+                        <th>الاتصال بالطالب</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{student.name.6}}</td>
+                        <td>{{student.id.6}}</td>
+                        <td><button class="btn btn-info">عرض صفحة الطالب</button></td>
+                        <td><button class="btn btn-primary">اتصال</button></td>
+                    </tr>
+                    <tr>
+                        <td>{{student.name.7}}</td>
+                        <td>{{student.id.7}}</td>
+                        <td><button class="btn btn-info">عرض صفحة الطالب</button>
+                            
+                        </td>
+                        <td><button class="btn btn-primary">اتصال</button></td>
+                    </tr>
+                    <!-- أضف المزيد من الطلاب هنا -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div  class=" w-100 h-250px " >
+            <h3> مضمون المحاضرة </h3>
+              <div class="bg-light m-1">
+            <p><br><br><br><br><br><br><br><br><br><br><br><br></p>
+              </div>
+        </div>
+        </div>
+        <div class="col-md-8">
+            <h3>نافذة المحاضرة الأسبوعية</h3>
+            <iframe src="video_url" width="100%" height="300" frameborder="0" allowfullscreen></iframe>
+           
+            <div class="text-center mt-3">
+                <a href="quastions.html" class="btn " style="background-color:#b5b1a9;">سؤال الاسبوع </a>
+            </div>
+        </div>
+        
+        </div>
+        
+    </div>
+</div>
+
+    <script>
+        function showHalaqat(trackId) {
+            // إخفاء جميع الحلقات
+            document.querySelectorAll('[id^="halaqat-track"]').forEach(function(element) {
+                element.classList.add('hidden');
+            });
+            // إخفاء جميع جداول الطلاب
+            document.querySelectorAll('[id^="students-halaqa"]').forEach(function(element) {
+                element.classList.add('hidden');
+            });
+            // إظهار الحلقات للمسار المحدد
+            document.getElementById(`halaqat-${trackId}`).classList.remove('hidden');
+        }
+
+        function showStudents(halaqaId) {
+            // إخفاء جميع جداول الطلاب
+            document.querySelectorAll('[id^="students-halaqa"]').forEach(function(element) {
+                element.classList.add('hidden');
+            });
+            // إظهار جدول الطلاب للحلقة المحددة
+            document.getElementById(`students-${halaqaId}`).classList.remove('hidden');
+        }
+    </script>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.js"></script>

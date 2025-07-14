@@ -1,0 +1,63 @@
+<!-- templates/students/registration_success.html -->
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل ناجح</title>
+    {% include 'parts/header.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+</head>
+<body>
+    <style>
+        .whatsapp-icon {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .whatsapp-icon img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .whatsapp-icon {
+                bottom: 10px;
+                left: 10px;
+            }
+
+            .whatsapp-icon img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+.container {
+            text-align: center;
+        }
+    </style>
+    <div class="container">
+         <h2 class="card-title text-success">تم التسجيل بنجاح!</h2>
+                    <p class="card-text">تم إنشاء حساب المعلم الخاص بك بنجاح.</p>
+                    <p class="card-text">سيتم التواصل معك لاحقا </p>
+                    <p class="card-text text-success">   يمكن التواصل معنا من خلال النقر على رمز الواتس اب الظاهر على الشاشة  </p>
+
+        <a href="{% url 'index' %}">العودة إلى الصفحة الرئيسية</a>
+    </div>
+    
+    {% include 'parts/footer.html' %}
+    <script src="js/jquery-3.7.1.js "></script>
+    <script src="js/popper.min.js "></script>
+    <script src="js/bootstrap.js "></script>
+
+    <!-- WhatsApp Floating Icon -->
+    <a href="https://wa.me/00967784252107" class="whatsapp-icon" target="_blank"> <!-- Replace 00967784252107 with the actual WhatsApp number -->
+        <img src="{% static 'icons/whatsapp.png' %}" alt="WhatsApp"> <!-- Ensure whatsapp.png exists in static/icons/ -->
+    </a>
+
+</body>
+</html>

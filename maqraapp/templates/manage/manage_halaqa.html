@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>إدارة الحلقات</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        /* Add any specific styles for halaqa page here */
+        .header {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .halaqa-icon {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 10px; /* Slightly rounded corners for icons */
+            text-align: center;
+            width: 180px; /* Increased size for better visibility */
+            height: 150px;
+            line-height: 30px; /* Adjust line height based on new size */
+            transition: background-color 0.3s ease;
+            text-decoration: none; /* Remove underline from link */
+            color: #000; /* Default text color */
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            word-break: break-word; /* Allow long names to wrap */
+        }
+        .halaqa-icon:hover {
+            background-color: #c0c0c0;
+        }
+        .halaqa-icon div {
+            word-break: break-word; /* Allow long names to wrap */
+        }
+    </style>
+</head>
+<body>
+    {% include 'parts/header.html' %}
+
+    <div class="header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>إدارة الحلقات</h1>
+        </div>
+        <div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <!-- Navigation Links -->
+                <div class="d-grid gap-2">
+                    <a href="{% url 'add_halaqa' %}" class="btn btn-primary d-block">اضافة حلقة</a>
+                    <button id="edit-halaqa-btn" class="btn btn-warning d-block">تعديل حلقة</button>
+                    <button id="delete-halaqa-btn" class="btn btn-danger d-block">حذف حلقة</button>
+                    <a href="{% url 'student_distribution' %}" class="btn btn-info d-block"><i class="bi bi-people"></i> توزيع الطلاب</a>{# Added Student Distribution link with icon #}
+                    <hr> {# Optional separator #}
+                    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary d-block">العودة للوحة التحكم</a>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <!-- Main Content: Halaqa Icons -->
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h2>الحلقات الموجودة</h2>
+                        <p>هنا سيتم عرض ايقونات للحلقات الموجودة في قاعدة البيانات.</p>
+                        <!-- Display halaqat from the database -->
+                        <div class="mt-4 d-flex flex-wrap justify-content-center">
+                            {% for halaqa in halaqat %}
+                            <div class="halaqa-icon m-2">
+                                <div>القسم: {{ halaqa.msar.section.name }}</div>
+                                <div>المسار: {{ halaqa.msar.name }}</div>
+                                <div>القراءة: {{ halaqa.typeread.name }}</div>
+                                <div>الحلقة: {{ halaqa.name }}</div>
+                                <input type="checkbox" name="selected_halaqat" value="{{ halaqa.id }}">
+                            </div>
+                            {% empty %}
+                            <p>لا توجد حلقات لعرضها.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'parts/footer.html' %}
+
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const editButton = document.getElementById('edit-halaqa-btn');
+            const deleteButton = document.getElementById('delete-halaqa-btn');
+            const checkboxes = document.querySelectorAll('input[name="selected_halaqat"]');
+
+            editButton.addEventListener('click', function() {
+                const selectedHalaqat = Array.from(checkboxes).filter(cb => cb.checked);
+
+                if (selectedHalaqat.length === 0) {
+                    alert('الرجاء تحديد حلقة واحدة للتعديل.');
+                } else if (selectedHalaqat.length > 1) {
+                    alert('الرجاء تحديد حلقة واحدة فقط للتعديل.');
+                } else {
+                    const halaqaId = selectedHalaqat[0].value;
+                    window.location.href = `/edit_halaqa/${halaqaId}/`; // Corrected URL for edit
+                }
+            });
+
+            deleteButton.addEventListener('click', function() {
+                const selectedHalaqat = Array.from(checkboxes).filter(cb => cb.checked);
+
+                if (selectedHalaqat.length === 0) {
+                    alert('الرجاء تحديد حلقة واحدة للحذف.');
+                } else if (selectedHalaqat.length > 1) {
+                    alert('الرجاء تحديد حلقة واحدة فقط للحذف.');
+                } else {
+                    const halaqaId = selectedHalaqat[0].value;
+                    if (confirm('هل أنت متأكد أنك تريد حذف هذه الحلقة؟')) {
+                        // Send a POST request to the delete URL
+                        fetch(`/delete_halaqa/${halaqaId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}', // Include CSRF token
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ halaqa_id: halaqaId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message) {
+                                alert(data.message);
+                                // Reload the page or remove the deleted item from the DOM
+                                location.reload();
+                            } else if (data.error) {
+                                alert('حدث خطأ: ' + data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('حدث خطأ أثناء حذف الحلقة.');
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

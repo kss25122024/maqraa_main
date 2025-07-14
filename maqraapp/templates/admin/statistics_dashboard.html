@@ -1,0 +1,192 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة إحصائيات المدير</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        /* Add any specific styles for statistics dashboard here */
+        .card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'parts/header.html' %}
+
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">إحصائيات النظام</h2>
+
+{% if not masarat_stats_json and not halaqat_stats_json and not hifz_stats_by_msar_json %}
+    <div class="alert alert-info text-center" role="alert">
+        لا توجد بيانات لعرض الإحصائيات حالياً.
+    </div>
+{% else %}
+        {# Charts #}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">إحصائيات المسارات</h5>
+                        <canvas id="masaratChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">إحصائيات الحلقات</h5>
+                        <canvas id="halaqatChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">إحصائيات الحفظ</h5>
+                        <canvas id="hifzChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12 text-center">
+                
+                <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">العودة إلى لوحة التحكم</a>
+            </div>
+        </div>
+{% endif %}
+    </div>
+
+    {% include 'parts/footer.html' %}
+
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Data passed from Django view (parsed from JSON)
+        const masaratStats = JSON.parse('{{ masarat_stats_json|escapejs }}');
+        const halaqatStats = JSON.parse('{{ halaqat_stats_json|escapejs }}');
+        const hifzStatsByMsar = JSON.parse('{{ hifz_stats_by_msar_json|escapejs }}');
+
+        // Prepare data for Masarat chart
+        const masaratLabels = masaratStats.map(item => item.name);
+        const masaratData = masaratStats.map(item => item.student_count);
+
+        // Render Masarat chart
+        const masaratCtx = document.getElementById('masaratChart').getContext('2d');
+        new Chart(masaratCtx, {
+            type: 'bar',
+            data: {
+                labels: masaratLabels,
+                datasets: [{
+                    label: 'عدد الطلاب',
+                    data: masaratData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'عدد الطلاب'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'إحصائيات الطلاب حسب المسار'
+                    }
+                }
+            }
+        });
+
+        // Prepare data for Halaqat chart
+        const halaqatLabels = halaqatStats.map(item => item.name);
+        const halaqatData = halaqatStats.map(item => item.student_count);
+
+        // Render Halaqat chart
+        const halaqatCtx = document.getElementById('halaqatChart').getContext('2d');
+        new Chart(halaqatCtx, {
+            type: 'bar',
+            data: {
+                labels: halaqatLabels,
+                datasets: [{
+                    label: 'عدد الطلاب',
+                    data: halaqatData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'عدد الطلاب'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'إحصائيات الطلاب حسب الحلقة'
+                    }
+                }
+            }
+        });
+
+        // Prepare data for Hifz chart (by Msar)
+        const hifzLabels = hifzStatsByMsar.map(item => item.name);
+        const hifzData = hifzStatsByMsar.map(item => item.total_pages_and_parts);
+
+        // Render Hifz chart
+        const hifzCtx = document.getElementById('hifzChart').getContext('2d');
+        new Chart(hifzCtx, {
+            type: 'bar',
+            data: {
+                labels: hifzLabels,
+                datasets: [{
+                    label: 'إجمالي الصفحات المحفوظة',
+                    data: hifzData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'إجمالي الصفحات المحفوظة'
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'إحصائيات الحفظ حسب المسار'
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>تقرير الطلاب</title>
+    {% load static %}
+    {% include 'parts/header.html' %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    {# Add any specific CSS for this page if needed #}
+    <style>
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                size: A4;
+            }
+            .container {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            .no-print {
+                display: none !important;
+            }
+            table {
+                width: 100%;
+            }
+        }
+    </style>
+    <style>
+        @media (max-width: 768px) { /* Apply styles on screens smaller than 768px */
+            .table-responsive table thead {
+                display: none; /* Hide table headers */
+            }
+            .table-responsive table,
+            .table-responsive table tbody,
+            .table-responsive table tr,
+            .table-responsive table td {
+                display: block; /* Make table elements block level */
+            }
+            .table-responsive table tr {
+                margin-bottom: 15px;
+                border: 1px solid #dee2e6;
+            }
+            .table-responsive table td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+            }
+            .table-responsive table td::before {
+                content: attr(data-label); /* Display data-label as a pseudo-element */
+                position: absolute;
+                left: 10px;
+                width: 45%;
+                padding-right: 10px;
+                white-space: nowrap;
+                font-weight: bold;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-center mb-0"> طلاب المقرأة</h2>
+            <a href="{% url 'manage_report' %}" class="btn btn-secondary btn-sm no-print">العودة</a>
+        </div>
+
+        <div class="row mb-3 no-print justify-content-center"> {# Add no-print to the search row and center content #}
+            <div class="col-12 col-md-8 col-lg-6 mb-2"> {# Make search input full width on small screens, wider on medium/large #}
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="ابحث عن طالب...">
+                    <button class="btn btn-primary" type="button">بحث</button>
+                </div>
+            </div>
+            <div class="col-6 col-md-2 col-lg-2 mb-2"> {# Make print button half width on small, narrower on medium/large #}
+                <button class="btn btn-secondary w-100" onclick="window.print()">طباعة التقرير</button>
+            </div>
+            <div class="col-6 col-md-2 col-lg-2 mb-2"> {# Make export button half width on small, narrower on medium/large #}
+                <a href="{% url 'export_student_report_excel' %}" class="btn btn-success w-100">تصدير إلى Excel</a>
+            </div>
+        </div>
+    
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>اسم الطالب</th>
+                        <th>رقم الطالب</th>
+                        <th>اسم الحلقة</th>
+                        <th>اسم القراءة</th>
+                        <th>اسم المسار</th>
+                        <th>اسم القسم</th>
+                        <th>رقم الواتس</th> {# Add new header column #}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td data-label="اسم الطالب">{{ student.first_name }} {{ student.last_name }}</td>
+                        <td data-label="رقم الطالب">{{ student.id }}</td>
+                        <td data-label="اسم الحلقة">{{ student.halaqa.name }}</td>
+                        <td data-label="اسم القراءة">{{ student.halaqa.type_class.name }}</td>
+                        <td data-label="اسم المسار">{{ student.halaqa.msar.name }}</td>
+                        <td data-label="اسم القسم">{{ student.halaqa.department.name }}</td>
+                        <td data-label="رقم الواتس">{{ student.whatsapp }}</td> {# Add new data cell #}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">لا يوجد طلاب لعرضهم.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6" class="text-center">© الخوارزمي للحلول الذكية</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="no-print">
+        {% include 'parts/footer.html' %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {# Add any specific JS for this page if needed #}
+    <script>
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            const searchQuery = document.querySelector('.form-control').value;
+            fetch(`{% url 'student_report' %}?search=${searchQuery}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Log the received data
+                    const tableBody = document.querySelector('tbody');
+                    tableBody.innerHTML = ''; // Clear existing rows
+                    if (data.students.length > 0) {
+                        data.students.forEach(student => {
+                            const row = `
+                                <tr>
+                                    <td data-label="اسم الطالب">${student.first_name} ${student.last_name}</td>
+                                    <td data-label="رقم الطالب">${student.id}</td>
+                                    <td data-label="اسم الحلقة">${student.halaqa_name}</td>
+                                    <td data-label="اسم القراءة">${student.typeread_name}</td>
+                                    <td data-label="اسم المسار">${student.msar_name}</td>
+                                    <td data-label="اسم القسم">${student.department_name}</td>
+                                    <td data-label="رقم الواتس">${student.whatsapp}</td> {# Add new data cell #}
+                                </tr>
+                            `;
+                            tableBody.innerHTML += row;
+                        });
+                    } else {
+                        tableBody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center">لا يوجد طلاب مطابقون لبحثك.</td>
+                            </tr>
+                        `;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!-- maqraapp/templates/maqraapp/student_list.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tasks</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-4">جدول المهام اليومية للطالب</h2>
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>اسم الطالب</th>
+                    <th>القسم</th>
+                    <th>المسار</th>
+                    <th>نوع القراءة</th>
+                    <th>الحفظ السابق</th>
+                    <th>الحفظ الحالي</th>
+                    <th>المراجعة السابقة</th>
+                    <th>المراجعة الحالية</th>
+                    <th>التلقين السابق</th>
+                    <th>التلقين الحالي</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td><a href="{% url 'student_detail' task.id %}">{{ task.student_name }}</a></td>
+                    <td>{{ task.section }}</td>
+                    <td>{{ task.track }}</td>
+                    <td>{{ task.reading_type }}</td>
+                    <td>{{ task.previous_memorization }}</td>
+                    <td>{{ task.current_memorization }}</td>
+                    <td>{{ task.previous_revision }}</td>
+                    <td>{{ task.current_revision }}</td>
+                    <td>{{ task.previous_recitation }}</td>
+                    <td>{{ task.current_recitation }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

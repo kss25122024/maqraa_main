@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+    <head>
+        {% load static %}
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+     
+<meta name="description" content="تسعى المقرأة اليمنية الإلكترونية إلى نشر وتعزيز التعليم القرآني، ورفع المستوى العلمي للحفاظ والحافظات، من خلال تقديم دورات وبرامج متخصصة في إقراء القرآن الكريم وتعليمه. كما تعمل على تأهيل الطلاب لنيل الإجازة في الروايات والقراءات المتواترة بالسند المتصل إلى النبي ﷺ، وفق الضوابط المعتمدة لدى مشايخ الإقراء وتتبع المقرأة اليمنية الالكترونية للجمعية الخيرية لتعليم القرآن الكريم">
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <link rel="stylesheet" href="{% static 'css/aihisayiyaat.css' %}">
+    
+    <title> المقرأة اليمنية  </title>
+   
+    <nav class="navbar navbar-top">
+        <div class="container d-flex align-items-center">
+            <div class="navbar-brand d-flex align-items-center" style="width: 100%;">
+                <div class="flex-grow-1 d-flex logo-container justify-content-center">
+                   
+                    <img src="{% static 'img/logo/الشعار صغير.png' %}" alt="شعار" width="200">
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    
+    
+    <nav class="navbar navbar-expand-lg navbar-light main-nav-bar">
+        <div class="container">
+        
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav justify-content-end">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'index' %}">الرئيسية</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}">من نحن</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'almaqraa' %}">عن المقرأة</a>
+                    </li>
+                   
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'teluse' %}">اتصل بنا</a>
+                    </li>
+                    
+                </ul>
+<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="تبديل التنقل">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+
+           </div>
+             <a class="navbar-brand" href="#">
+
+               </a>
+        </div>
+    </nav>
+</header>
+

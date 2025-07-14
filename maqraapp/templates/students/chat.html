@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>دردشة الأستاذ والطالب</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <style>
+        body {
+            direction: rtl;
+            text-align: right;
+            background-color: #dcd3c1;
+          
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 60%;
+            max-height: 80vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            margin: 10px 20%;
+        }
+        .message-box {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .sender {
+            font-weight: bold;
+        }
+        .content {
+            margin-left: 20px;
+        }
+        .info {
+            margin-bottom: 20px;
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+            margin: 20px;
+        }
+    </style>
+    {% include 'parts/header.html' %}
+</head>
+<body>
+    <div class="chat-container">
+        <div id="chat-box" class="message-box">
+            {% for message in messages %}
+                <div class="message">
+                    {% if message.sender == request.user %}
+                        <p class="sender">أنت:</p>
+                    {% else %}
+                        <p class="sender">{{ message.sender.username }}:</p>
+                    {% endif %}
+                    <p class="content">{{ message.content }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">إرسال</button>
+        </form>
+    </div>
+    <div class="center-button">
+        <a href="javascript:history.back()" class="btn btn-success">عودة</a>
+       
+    </div>
+    {% include 'parts/footer.html' %}
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+</body>
+</html>

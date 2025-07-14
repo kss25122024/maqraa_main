@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>إضافة مهمة الحفظ اليومية</title>
+    {% include 'parts/header.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        body {
+             direction: rtl; text-align: right;
+             }
+        .center-button {
+             text-align: center; margin-top: 20px;
+             }
+             .card { 
+                margin: 20px 0;
+             }
+        .center-card {
+             display: flex;
+              justify-content: center;
+             }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header d-flex justify-content-between align-items-center">
+            <div>
+                <h1>مرحباً: {{ user.get_full_name }} </h1>
+            </div>
+            <div>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+                </form>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="col-md-6">
+                <div class="card " style="background-color: #f2f2f0;">
+                    <div class="card-body">
+                        <h2>إضافة مهمة الحفظ اليومية للطالب: {{ student.first_name }} {{ student.last_name }}</h2>
+                        <form id="MemorizationForm" method="post" action="{% url 'save_memorization_task' %}">
+                            {% csrf_token %}
+                             <input type="hidden" name="student_id" value="{{ student.id }}" />
+
+                            
+                            <div class="form-group">
+                                {{ form.MemorizationTask.label_tag }}
+                                {{ form.MemorizationTask }}
+                           </div>
+                           <div class="form-group">
+                               {{ form.previous_surah.label_tag }}
+                               <select id="id_previous_surah" name="previous_surah" class="form-control">
+                                   <option value="">اختر سورة</option>
+                               </select>
+                            </div>
+                            <div class="form-group">
+                                {{ form.previous_ayat.label_tag }}
+                                <select id="id_previous_ayat" name="previous_ayat" class="form-control">
+                                    <option value="">اختر آية</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                {{ form.current_surah.label_tag }}
+                                <select id="id_current_surah" name="current_surah" class="form-control">
+                                    <option value="">اختر سورة</option>
+                               </select>
+                            </div>
+                
+                            <div class="form-group">
+                                {{ form.current_ayat.label_tag }}
+                                <select id="id_current_ayat" name="current_ayat" class="form-control">
+                                    <option value="">اختر آية</option>
+                               </select>
+                           </div>
+                           <div class="form-group">
+                               {{ form.pages.label_tag }}
+                               {{ form.pages }}
+                           </div>
+                           <div class="form-group">
+                               {{ form.partial_page.label_tag }}
+                               {{ form.partial_page }}
+                           </div>
+                           <div class="form-group">
+                               {{ form.grade.label_tag }}
+                               {{ form.grade }}
+                           </div>
+                           <div class="form-group">
+                               {{ form.date.label_tag }}
+                               {{ form.date }}
+                           </div>
+                           <div class="form-group">
+                              {{ form.memorized_ayat_count.label_tag }}
+                              {{ form.memorized_ayat_count }}
+                           </div>
+                           <button type="submit" class="btn btn-primary">حفظ</button>
+                        </form>
+                       <div class="center-button">
+                          <a href="javascript:history.back()" class="btn btn-success">عودة</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script src="{% static 'js/7.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        const memorizationTaskSelect = document.getElementById("id_MemorizationTask");
+        const previousSurahSelect = document.getElementById("id_previous_surah");
+        const currentSurahSelect = document.getElementById("id_current_surah");
+        const previousAyatSelect = document.getElementById("id_previous_ayat");
+        const currentAyatSelect = document.getElementById("id_current_ayat");
+
+         const category_surahs = {
+             "1": ["الفاتحة", "الناس", "الفلق", "الإخلاص", "المسد", "النصر", "الكافرون", "الكوثر", "الماعون", "قريش", "الفيل", "الهمزة", "العصر", "التكاثر", "القارعة", "العاديات", "الزلزلة", "البينة", "القدر", "العلق", "التين", "الشرح", "الضحى", "الليل", "الشمس", "البلد", "الفجر", "الغاشية", "الأعلى", "الطارق", "البروج", "الإنشقاق", "المطففين", "الانفطار", "التكوير", "عبس", "النازعات", "النبأ"],
+             "2": ["المرسلات", "الإنسان", "القيامة", "المدثر", "المزمل", "الجن", "نوح", "المعارج", "الحاقة", "القلم", "الملك", "التحريم", "الطلاق", "التغابن", "المنافقون", "الجمعة", "الصف", "الممتحنة", "الحشر", "المجادلة"],
+             "3": ["الحديد", "الواقعة", "الرحمن", "القمر", "النجم", "الطور", "الذاريات", "ق", "الحجرات", "الفتح", "محمد", "الأحقاف"],
+             "4": ["الجاثية", "الدخان", "الزخرف", "الشورى", "فصلت", "غافر", "الزمر", "ص", "الصافات", "يس", "فاطر", "سبأ", "الأحزاب", "السجدة", "لقمان", "الروم"],
+             "5": ["العنكبوت", "القصص", "النمل", "الشعراء", "الفرقان", "النور", "المؤمنون", "الحج", "الأنبياء", "طه", "مريم"],
+             "6": ["الكهف", "الإسراء", "النحل", "الحجر", "إبراهيم", "الرعد", "يوسف", "هود", "يونس"],
+             "7": ["التوبة", "الأنفال", "الأعراف", "الأنعام", "المائدة", "النساء", "آل عمران", "البقرة"]
+         };
+
+         const ayatCounts = {
+             "الفاتحة": 7, "البقرة": 286, "آل عمران": 200, "النساء": 176, "المائدة": 120, "الأنعام": 165, "الأعراف": 206, "الأنفال": 75, "التوبة": 129, "يونس": 109, "هود": 123, "يوسف": 111, "الرعد": 43, "إبراهيم": 52, "الحجر": 99, "النحل": 128, "الإسراء": 111, "الكهف": 110, "مريم": 98, "طه": 135, "الأنبياء": 112, "الحج": 78, "المؤمنون": 118, "النور": 64, "الفرقان": 77, "الشعراء": 227, "النمل": 93, "القصص": 88, "العنكبوت": 69, "الروم": 60, "لقمان": 34, "السجدة": 30, "الأحزاب": 73, "سبأ": 54, "فاطر": 45, "يس": 83, "الصافات": 182, "ص": 88, "الزمر": 75, "غافر": 85, "فصلت": 54, "الشورى": 53, "الزخرف": 89, "الدخان": 59, "الجاثية": 37, "الأحقاف": 35, "محمد": 38, "الفتح": 29, "الحجرات": 18, "ق": 45, "الذاريات": 60, "الطور": 49, "النجم": 62, "القمر": 55, "الرحمن": 78, "الواقعة": 96, "الحديد": 29, "المجادلة": 22, "الحشر": 24, "الممتحنة": 13, "الصف": 14, "الجمعة": 11, "المنافقون": 11, "التغابن": 18, "الطلاق": 12, "التحريم": 12, "الملك": 30, "القلم": 52, "الحاقة": 52, "المعارج": 44, "نوح": 28, "الجن": 28, "المزمل": 20, "المدثر": 56, "القيامة": 40, "الإنسان": 31, "المرسلات": 50, "النبأ": 40, "النازعات": 46, "عبس": 42, "التكوير": 29, "الانفطار": 19, "المطففين": 36, "الانشقاق": 25, "البروج": 22, "الطارق": 17, "الأعلى": 19, "الغاشية": 26, "الفجر": 30, "البلد": 20, "الشمس": 15, "الليل": 21, "الضحى": 11, "الشرح": 8, "التين": 8, "العلق": 19, "القدر": 5, "البينة": 8, "الزلزلة": 8, "العاديات": 11, "القارعة": 11, "التكاثر": 8, "العصر": 3, "الهمزة": 9, "الفيل": 5, "قريش": 4, "الماعون": 7, "الكوثر": 3, "الكافرون": 6, "النصر": 3, "المسد": 5, "الإخلاص": 4, "الفلق": 5, "الناس": 6
+         };
+
+         function updateSurahOptions(category) {
+             const options = category_surahs[category] || [];
+             console.log("Options for category", category, ":", options); // Add logging
+             // Clear existing options
+             while (previousSurahSelect.options.length > 0) {
+                 previousSurahSelect.remove(0);
+             }
+             while (currentSurahSelect.options.length > 0) {
+                 currentSurahSelect.remove(0);
+             }
+     
+             // Add the default "اختر سورة" option
+             const defaultOption = document.createElement("option");
+             defaultOption.value = "";
+             defaultOption.text = "اختر سورة";
+             previousSurahSelect.appendChild(defaultOption.cloneNode(true));
+             currentSurahSelect.appendChild(defaultOption.cloneNode(true));
+     
+             options.forEach(surah => {
+                 const optionElement = document.createElement("option");
+                 optionElement.value = surah;
+                 optionElement.text = surah;
+                 previousSurahSelect.appendChild(optionElement.cloneNode(true));
+                 currentSurahSelect.appendChild(optionElement);
+             });
+     
+             // Ensure the default option is selected after repopulating
+             previousSurahSelect.selectedIndex = 0;
+             currentSurahSelect.selectedIndex = 0;
+     
+             // إذا كانت هناك سور، اختر الأولى كقيمة افتراضية وحدث خيارات الآيات
+             if (options.length > 0) {
+            const firstSurah = options[0];
+            previousSurahSelect.value = firstSurah;
+            currentSurahSelect.value = firstSurah;
+            updateAyatOptions(firstSurah, previousAyatSelect);
+            updateAyatOptions(firstSurah, currentAyatSelect);
+        } else {
+                 // إذا لم تكن هناك سور، قم بمسح خيارات الآيات
+                 previousAyatSelect.innerHTML = '<option value="">اختر آية</option>';
+                 currentAyatSelect.innerHTML = '<option value="">اختر آية</option>';
+             }
+             return options;
+         }
+
+         function updateAyatOptions(surah, ayatSelect) {
+             const ayatCount = ayatCounts[surah] || 0;
+             ayatSelect.innerHTML = '<option value="">اختر آية</option>';
+             for (let i = 1; i <= ayatCount; i++) {
+                 const optionElement = document.createElement("option");
+                 optionElement.value = i;
+                 optionElement.text = i;
+                 ayatSelect.appendChild(optionElement);
+             }
+         }
+
+         memorizationTaskSelect.addEventListener('change', function () {
+             const category = memorizationTaskSelect.value;
+             // Directly use the selected category value as the key
+             console.log("Selected category value:", category); // Add logging
+             // Add a small delay to potentially allow other scripts to run first
+             setTimeout(function() {
+                 updateSurahOptions(category);
+             }, 100); // 100ms delay
+         });
+     
+         previousSurahSelect.addEventListener('change', function () {
+             const selectedSurah = previousSurahSelect.value;
+             updateAyatOptions(selectedSurah, previousAyatSelect);
+         });
+     
+         currentSurahSelect.addEventListener('change', function () {
+             const selectedSurah = currentSurahSelect.value;
+             updateAyatOptions(selectedSurah, currentAyatSelect);
+         });
+     
+         // تعيين الفئة الافتراضية '1' وتحميل السور والآيات الأولية عند تحميل الصفحة
+         memorizationTaskSelect.value = '1';
+         updateSurahOptions('1'); // استدعاء الوظيفة التي تحدث السور والآيات
+
+         const form = document.getElementById('MemorizationForm');
+         form.addEventListener('submit', function(event) {
+             event.preventDefault();
+             const formData = new FormData(form);
+             const data = {};
+             formData.forEach((value, key) => {
+                 data[key] = value;
+             });
+     
+             console.log("Sending Data:", data);
+     
+             fetch(form.action, {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                     'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                 },
+                 body: JSON.stringify(data)
+             })
+             .then(response => response.json())
+             .then(data => {
+                 if (data.message) {
+                     alert(data.message);
+                     if (data.student_id && data.halaqa_id) {
+                         window.location.href = `/halaqa/${data.halaqa_id}/`;
+                     } else if (data.student_id) {
+                         window.location.href = `/student/${data.student_id}/`;
+                     }
+                 } else if (data.error) {
+                     alert("Error: " + data.error);
+                 }
+             })
+             .catch(error => {
+                 console.error('Error:', error);
+            alert("An error occurred while saving the task.");
+             });
+         });
+     });
+
+
+    </script>
+</body>
+</html>

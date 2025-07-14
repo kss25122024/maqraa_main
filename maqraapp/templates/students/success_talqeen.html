@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>نجاح إضافة مهمة التلقين اليومية</title>
+    {% include 'parts/header.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <style>
+        body {
+            direction: rtl;
+            text-align: right;
+        }
+        .center-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header d-flex justify-content-between align-items-center">
+            <div>
+                <h1>مرحباً: {{ user.get_full_name }} </h1>
+            </div>
+            <div>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+                </form>
+            </div>
+        </div>
+        
+    <div class="container">
+        <h2>تم إضافة مهمة التلقين اليومية بنجاح للطالب: {{ student.first_name }} {{ student.last_name }}</h2>
+        <div class="center-button">
+            <a href="{% url 'Daily_Talqeen_Task_select_student' student.halaqa.id %}" class="btn btn-primary">إضافة مهمة جديدة</a>
+            <a href="javascript:history.back()" class="btn btn-success">عودة</a>
+        </div>
+    </div>
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+</body>
+</html>

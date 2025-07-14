@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>اختيار طالب لإضافة مهمة الحفظ اليومية</title>
+    {% include 'parts/header.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <style>
+        .center-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header d-flex justify-content-between align-items-center">
+            <div>
+                <h1>مرحباً: {{ user.get_full_name }} </h1>
+            </div>
+            <div>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+                </form>
+            </div>
+        </div>
+        
+        <h2>اختيار طالب لإضافة مهمة الحفظ اليومية</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>اسم الطالب</th>
+                    <th>رقم الطالب</th>
+                    <th>اختيار</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.first_name }} {{ student.last_name }}</td>
+                    <td>{{ student.id }}</td>
+                    <td>
+                        <a href="{% url 'add_memorization_task' student.id %}" class="btn btn-primary">اختيار</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <!-- زر العودة في منتصف الصفحة -->
+        <div class="center-button">
+            <a href="javascript:history.back()" class="btn btn-success">عودة</a>
+        </div>
+
+    </div>
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+</body>
+</html>

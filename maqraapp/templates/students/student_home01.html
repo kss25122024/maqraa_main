@@ -1,0 +1,14 @@
+<div class="header d-flex justify-content-between align-items-center">
+    <div>
+        <h1>مرحباً: {{ user.get_full_name }} </h1>
+    </div>
+    <div>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+        </form>
+    </div>
+</div>
+
+<h1>مرحبا, {{ user.username }}</h1>
+<p>لقد تم تسجيل الدخول بنجاح الطالب!</p>

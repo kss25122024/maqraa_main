@@ -1,0 +1,86 @@
+
+{% block title %}إدارة التقارير{% endblock %}
+{% load static %}
+ {% include 'parts/header.html' %}
+{% block content %}
+<div class="header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>مرحباً بالشيخ: {{ user.first_name }} {{ user.last_name }}</h1>
+        </div>
+        <div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+            </form>
+        </div>
+    </div>
+<div class="container mt-4 py-4">
+    <h2 class="text-center mb-4">إدارة التقارير</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <a href="{% url 'student_report' %}">
+                        <img src="{% static 'icons/student.png' %}?v={{ cache_buster }}" alt="تقرير الطلاب" class="report-icon">
+                        <h5 class="card-title">تقرير الطلاب</h5>
+                    </a>
+                    <a href="{% url 'student_report' %}" class="btn btn-primary mt-3">عرض التقرير</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <a href="{% url 'teacher_report' %}">
+                        <img src="{% static 'icons/teacher.png' %}?v={{ cache_buster }}" alt="تقرير المدرسين" class="report-icon">
+                        <h5 class="card-title">تقرير المدرسين</h5>
+                    </a>
+                    <a href="{% url 'teacher_report' %}" class="btn btn-success mt-3">عرض التقرير</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <a href="{% url 'memorization_report' %}">
+                        <img src="{% static 'icons/book.png' %}?v={{ cache_buster }}" alt="تقرير الحفظ" class="report-icon">
+                        <h5 class="card-title">تقرير الحفظ</h5>
+                    </a>
+                    <a href="{% url 'memorization_report' %}" class="btn btn-info mt-3">عرض التقرير</a>
+                </div>
+            </div>
+        </div>
+<div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <a href="{% url 'halaqa_report' %}">
+                        <img src="{% static 'icons/halaqa.png' %}?v={{ cache_buster }}" alt="تقرير الحلقات" class="report-icon">
+                        <h5 class="card-title">تقرير الحلقات</h5>
+                    </a>
+                    <a href="{% url 'halaqa_report' %}" class="btn btn-warning mt-3">عرض التقرير</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <a href="{% url 'student_report_single' %}">
+                        <img src="{% static 'icons/single_student.png' %}?v={{ cache_buster }}" alt="تقرير طالب" class="report-icon">
+                        <h5 class="card-title">تقرير طالب</h5>
+                    </a>
+                    <a href="{% url 'student_report_single' %}" class="btn btn-danger mt-3">عرض التقرير</a>
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+    </div>
+    </div>
+</div>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-4 mb-4">
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">العودة إلى لوحة التحكم</a>
+        </div>
+    </div>
+{% include 'parts/footer.html' %}
+{% endblock %}

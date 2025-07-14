@@ -1,0 +1,54 @@
+{% load static %}
+{% load youtube_filters %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include 'parts/header.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        .center-button {
+            display: flex;
+            justify-content: center;
+            margin: 20px;
+        }
+    </style>
+    <title>{{ lecture.title }}</title>
+</head>
+<body>
+    <div class="container">
+        <div class="header d-flex justify-content-between align-items-center">
+            <div>
+                <h1>مرحباً: {{ user.get_full_name }} </h1>
+            </div>
+            <div>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+                </form>
+            </div>
+        </div>
+
+        <h1>{{ lecture.title }}</h1>
+        <p>{{ lecture.description }}</p>
+        {% if lecture.youtube_link %}
+            <iframe width="560" height="315" src="{{ lecture.youtube_link|youtube_embed }}" frameborder="0" allowfullscreen></iframe>
+        {% else %}
+            <p>لا يتوفر فيديو لهذه المحاضرة.</p>
+        {% endif %}
+        
+
+    </div>
+    <div class="center-button">
+        <a href="javascript:history.back()" class="btn btn-success">عودة</a>
+    </div>
+    {% include 'parts/footer.html' %}
+    
+    <script src="js/jquery-3.7.1.js "></script>
+    <script src="js/popper.min.js "></script>
+    <script src="js/bootstrap.js "></script>
+</body>
+</html>

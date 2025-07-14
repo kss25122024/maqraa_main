@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اتصل بنا</title>
+    {% include 'parts/header.html' %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <style>
+        body {
+            direction: rtl;
+            text-align: right;
+            background-color: #dcd3c1;
+            font-family: "Times New Roman", Times, serif;
+            font-size: larger;
+        }
+
+        .card-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* يجعل البطاقة في منتصف الصفحة عمودياً */
+        }
+
+        .card {
+            width: 50%; /* تمثل نصف الصفحة */
+            background-color: #f1edec;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* مسافة بين الزرين */
+            margin-top: 20px;
+        }
+
+        h1,
+        label {
+            color: #000;
+            font-weight: bold;
+        }
+
+        h1 {
+            font-size: 2.4em; /* تكبير الخط للعناوين */
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            font-size: 1.2em; /* تكبير الخط للحقل */
+            line-height: 1.5; /* تحسين المسافة بين السطور */
+        }
+
+        .btn {
+            font-size: 1.2em; /* تكبير الخط للأزرار */
+            font-weight: bold; /* جعل الخط عريض */
+        }
+
+        .invalid-feedback {
+            font-size: 1em; /* تحسين ظهور الرسائل */
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="card-container">
+        <div class="card">
+            <h1>اتصل بنا</h1>
+            {% if messages %}
+            <div class="alert alert-success" role="alert">
+                {% for message in messages %}
+                {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="name">الاسم</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                    <div class="invalid-feedback">يرجى إدخال اسمك.</div>
+                </div>
+                <div class="form-group">
+                    <label for="phone">رقم الهاتف</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" required>
+                    <div class="invalid-feedback">يرجى إدخال رقم هاتف صحيح.</div>
+                </div>
+                <div class="form-group">
+                    <label for="whatsapp">رقم الواتساب</label>
+                    <input type="tel" class="form-control" id="whatsapp" name="whatsapp" required>
+                    <div class="invalid-feedback">يرجى إدخال رقم واتساب صحيح.</div>
+                </div>
+                <div class="form-group">
+                    <label for="email">البريد الإلكتروني</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                    <div class="invalid-feedback">يرجى إدخال بريد إلكتروني صحيح.</div>
+                </div>
+                <div class="form-group">
+                    <label for="subject">عنوان الرسالة</label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                    <div class="invalid-feedback">يرجى إدخال عنوان الرسالة.</div>
+                </div>
+                <div class="form-group">
+                    <label for="message">نص الرسالة</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                    <div class="invalid-feedback">يرجى كتابة رسالتك.</div>
+                </div>
+                <div class="button-container">
+                    <button type="submit" class="btn btn-primary">إرسال</button>
+                    <button type="reset" class="btn btn-secondary">إعادة تعيين</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% include 'parts/footer.html' %}
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script>
+        // JavaScript for disabling form submissions if there are invalid fields
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+</body>
+
+</html>

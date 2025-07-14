@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>توزيع الطلاب</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        /* Add any specific styles for student distribution page here */
+        @media print {
+            /* Hide elements not needed for print */
+            .footer, .btn, button, .no-print {
+                display: none !important;
+            }
+            /* Ensure header, title, and table are visible and formatted for print */
+            body {
+                visibility: visible; /* Make body visible */
+            }
+            .container {
+                position: static; /* Remove absolute positioning */
+                left: auto;
+                top: auto;
+                margin-top: 0 !important; /* Remove top margin in print */
+            }
+            h1, h2, p {
+                color: #000 !important; /* Ensure text is black for printing */
+            }
+            table {
+                width: 100%; /* Adjust table width for print */
+                border-collapse: collapse; /* Collapse borders for cleaner look */
+                margin-top: 20px; /* Add some space above the table */
+            }
+            table, th, td {
+                border: 1px solid #000; /* Add borders to table cells */
+                padding: 8px; /* Add padding to cells */
+            }
+            th {
+                background-color: #f2f2f2 !important; /* Light background for headers */
+                color: #000 !important;
+            }
+            /* Ensure header content is visible */
+            .container .mt-4 {
+                 margin-top: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'parts/header.html' %}
+
+    <div class="container mt-4">
+        <h1>توزيع الطلاب</h1>
+        <p>إجمالي عدد الطلاب في المقرأة: <strong>{{ total_students }}</strong></p>
+
+    </div>
+    <button class="btn btn-secondary mb-3" onclick="history.back()">العودة</button>
+    <button class="btn btn-primary mb-3" onclick="printPage()">طباعة الجدول</button>
+    <button class="btn btn-success mb-3" onclick="exportToExcel()">تصدير إلى Excel</button>
+    <button class="btn btn-danger mb-3" id="delete-student-btn">حذف طالب</button>
+    <h2 class="mt-4">قائمة جميع الطلاب وتوزيعهم على الحلقاب</h2>
+    <table class="table table-bordered table-striped" id="studentTable">
+        <thead>
+            <tr>
+                <th>اسم الطالب</th>
+                <th>اسم الحلقة</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td><a href="#" class="student-name-link" data-student-id="{{ student.id }}">{{ student.first_name }} {{ student.last_name }}</a></td>
+                <td>{% if student.halaqa %}{{ student.halaqa.name }}{% else %}لم يتم التوزيع{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">لا يوجد طلاب لعرضهم.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+           <tfoot>
+                    <tr>
+                        <td colspan="6" class="text-center">© الخوارزمي للحلول الذكية</td>
+                    </tr>
+            </tfoot>
+    </table>
+
+    {% include 'parts/footer.html' %}
+
+    <script>
+        function printPage() {
+            window.print();
+        }
+
+        function exportToExcel() {
+            const table = document.getElementById('studentTable');
+            let csv = [];
+            for (let i = 0; i < table.rows.length; i++) {
+                let row = [], cols = table.rows[i].querySelectorAll('td, th');
+                for (let j = 0; j < cols.length; j++) {
+                    row.push(cols[j].innerText);
+                }
+                csv.push(row.join(','));
+            }
+
+            // Download CSV
+            const csvContent = "data:text/csv;charset=utf-8," + csv.join('\\n');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'student_distribution.csv');
+            document.body.appendChild(link); // Required for FF
+            link.click(); // This will download the data file named "student_distribution.csv".
+            document.body.removeChild(link); // Clean up
+        }
+    </script>
+
+    <!-- Modal for assigning Halaqa -->
+    <div class="modal fade" id="assignHalaqaModal" tabindex="-1" aria-labelledby="assignHalaqaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignHalaqaModalLabel">تخصيص حلقة للطالب</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>اسم الطالب: <strong id="studentNameInModal"></strong></p>
+                    <input type="hidden" id="studentIdInModal">
+                    <div class="mb-3">
+                        <label for="halaqaSelect" class="form-label">اختر الحلقة:</label>
+                        <select class="form-select" id="halaqaSelect">
+                            <option value="">-- اختر حلقة --</option>
+                            {% for halaqa in halaqat %}
+                                <option value="{{ halaqa.id }}">{{ halaqa.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="saveHalaqaAssignment">تفعيل</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for selecting student to delete -->
+    <div class="modal fade" id="deleteStudentSelectModal" tabindex="-1" aria-labelledby="deleteStudentSelectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteStudentSelectModalLabel">تحديد طالب للحذف</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="studentSelectToDelete" class="form-label">اختر الطالب:</label>
+                        <select class="form-select" id="studentSelectToDelete">
+                            <option value="">-- اختر طالب --</option>
+                            {# Options will be populated by JavaScript #}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-danger" id="confirmSelectStudentToDelete">تحديد</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for confirming student deletion -->
+    <div class="modal fade" id="deleteStudentConfirmModal" tabindex="-1" aria-labelledby="deleteStudentConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteStudentConfirmModalLabel">تأكيد حذف الطالب</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>هل أنت متأكد أنك تريد حذف الطالب: <strong id="studentNameToDelete"></strong>؟</p>
+                    <input type="hidden" id="studentIdToDelete">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteStudent">حذف</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Embed halaqat data as JSON
+        const halaqatData = JSON.parse('{{ halaqat_json|escapejs }}');
+    </script>
+
+
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/bootstrap-bundle.js' %}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const studentLinks = document.querySelectorAll('.student-name-link');
+            // Initialize the modal after the DOM is fully loaded and Bootstrap is available
+            const assignHalaqaModalElement = document.getElementById('assignHalaqaModal');
+            const assignHalaqaModal = new bootstrap.Modal(assignHalaqaModalElement);
+            const studentNameInModal = document.getElementById('studentNameInModal');
+            const studentIdInModal = document.getElementById('studentIdInModal');
+            const halaqaSelect = document.getElementById('halaqaSelect');
+            const saveHalaqaAssignmentButton = document.getElementById('saveHalaqaAssignment');
+
+            studentLinks.forEach(link => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    console.log('Student name link clicked'); // Log click event
+                    const studentId = this.getAttribute('data-student-id');
+                    const studentName = this.innerText;
+
+                    studentIdInModal.value = studentId;
+                    studentNameInModal.innerText = studentName;
+
+                    // Reset select and set current halaqa if exists
+                    halaqaSelect.value = ''; // Reset to default
+                    // To pre-select the student's current halaqa, the student data
+                    // passed from the view would need to include their current halaqa ID.
+                    // This is not currently implemented in the view.
+
+                    console.log('Attempting to show modal. bootstrap:', typeof bootstrap, 'assignHalaqaModal:', assignHalaqaModal); // Log before showing modal
+                    assignHalaqaModal.show();
+                });
+            });
+
+            saveHalaqaAssignmentButton.addEventListener('click', function () {
+                const studentId = studentIdInModal.value;
+                const halaqaId = halaqaSelect.value;
+
+                if (!halaqaId) {
+                    alert('Please select a halaqa.');
+                    return;
+                }
+
+                // Send data to the backend
+                fetch('/assign_halaqa/', { // This URL needs to be created in urls.py
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken') // Get CSRF token
+                    },
+                    body: JSON.stringify({
+                        student_id: studentId,
+                        halaqa_id: halaqaId
+                    })
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data:', data);
+                    if (data.success) {
+                        alert('Halaqa assigned successfully!');
+                        assignHalaqaModal.hide();
+                        // Optionally update the table row with the new halaqa name
+                        location.reload(); // Simple reload for now
+                    } else {
+                        alert('Error assigning halaqa: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch Error:', error);
+                    alert('An error occurred while assigning halaqa. Check console for details.');
+                });
+            });
+
+            // Function to get CSRF token
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        });
+    </script>
+    <script>
+        console.log('Bootstrap object:', typeof bootstrap); // Check if bootstrap is defined
+    </script>
+</body>
+</html>

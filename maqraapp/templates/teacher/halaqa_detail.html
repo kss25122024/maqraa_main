@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تفاصيل الحلقة</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <style>
+        .halaqa-icon {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            text-align: center;
+            width: 100px;
+            height: 100px;
+            line-height: 70px;
+            transition: background-color 0.3s ease;
+        }
+        .halaqa-icon:hover {
+            background-color: #c0c0c0;
+        }
+        .halaqa-link {
+            text-decoration: none;
+            color: #000;
+        }
+        .hidden {
+            display: none;
+        }
+        .center-button {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* لإضافة مسافة بين الأزرار */
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            font-size: 16px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+            font-weight: bold;
+        }
+        td {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    {% include 'parts/header.html' %}
+    <div class="header d-flex justify-content-between align-items-center">
+        <div>
+            <h1>مرحباً:  {{ user.teacher_profile.first_name }} {{ user.teacher_profile.last_name }} </h1>
+        </div>
+        <div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="card mb-4 text-center">
+                <div class="card-body">
+                    <h1>تفاصيل الحلقة: {{ halaqa.name }}</h1>
+                    <p>مستوى الحلقة: <strong>{{ halaqa.level }}</strong></p>
+                    <p>نوع القراءة: <strong>{{ halaqa.type_class }}</strong></p>
+                    <p>الطاقة الاستيعابية: <strong>{{ halaqa.count }}</strong></p>
+                    <p>وقت البداية: <strong>{{ halaqa.start_time }}</strong></p>
+                    <p>وقت النهاية: <strong>{{ halaqa.end_time }}</strong></p>
+                    <p>الأستاذ: <strong>{{ halaqa.teacher.first_name }} {{ halaqa.teacher.last_name }}</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- جدول الطلاب -->
+    <div class="container">
+        <div class="row">
+            <!-- Buttons Column -->
+            <div class="col-md-2">
+                <a href="{% url 'Daily_Memorization_Task_select_student' halaqa_id=halaqa.id %}" class="btn btn-success btn-sm mb-2 d-block">إضافة مهمة الحفظ اليومية</a>
+                <a href="{% url 'Daily_Review_Task_select_student' halaqa_id=halaqa.id %}" class="btn btn-info btn-sm mb-2 d-block">إضافة مهمة المراجعة اليومية</a>
+                <a href="{% url 'Daily_Talqeen_Task_select_student' halaqa_id=halaqa.id %}" class="btn btn-warning btn-sm mb-2 d-block">إضافة مهمة التلقين اليومية</a>
+                <a href="{% url 'weekly_plan_select_student' halaqa_id=halaqa.id %}" class="btn btn-danger btn-sm mb-2 d-block">إضافة الخطة الاسبوعية </a>
+                <a href="{% url 'lecture_list' %}" class="btn btn-secondary btn-sm mb-2 d-block">المحاضرة الاسبوعية</a>
+                <a href="{% url 'memorization_history' halaqa_id=halaqa.id %}" class="btn btn-primary btn-sm mb-2 d-block">سجل الحفظ</a>
+                <button id="printTable" class="btn btn-secondary btn-sm mb-2 d-block" style="width: 100%;">طباعة الجدول </button>
+                <button id="exportExcel" class="btn btn-success btn-sm mb-2 d-block"style="width: 100%;">تصدير إلى Excel</button>
+                {% if username %}
+                    <a href="{% url 'teacher_home' username=username %}" class="btn btn-primary btn-sm d-block">عودة</a>
+
+                {% else %}
+                    <div class="alert alert-warning">اسم المستخدم غير موجود. الرجاء المحاولة مرة أخرى.</div>
+                {% endif %}
+                
+            </div>
+            <!-- Student Table Column -->
+            <div class="col-md-10">
+                <h3>طلاب الحلقة</h3>
+                <table id="studentsTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>اسم الطالب</th>
+                            <th>رقم الطالب</th>
+                            <th>عرض صفحة الطالب</th>
+                            <th>الاتصال بالطالب</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.first_name }} {{ student.last_name }}</td>
+                            <td>{{ student.id }}</td>
+                            <td>
+                                <a href="{% url 'student_detail' student.id %}" class="btn btn-info">عرض صفحة الطالب</a>
+                            </td>
+                            <td><button class="btn btn-primary">اتصال</button></td>
+                        </tr>
+                        {% endfor %}
+                                                <tr>
+                                                    <td colspan="4" style="text-align: center;">© الخوارزمي للحلول الذكية</td>
+                                                </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% include 'parts/footer.html' %}
+
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script>
+        document.getElementById('printTable').addEventListener('click', function() {
+            var printContents = document.getElementById('studentsTable').outerHTML;
+            var originalContents = document.body.innerHTML;
+            var header = "<div style=\"text-align: center;\"><img src=\"{% static 'img/logo/الشعار صغير.png' %}\" alt=\"شعار\" width=\"200\"></div><br><h2>طلاب الحلقة: {{ halaqa.name }}</h2>"; // Add your desired header content here
+
+            // Find the closing tag of the tbody and insert the footer row before it
+            var tbodyEndIndex = printContents.lastIndexOf('</tbody>');
+            if (tbodyEndIndex !== -1) {
+                printContents = printContents.substring(0, tbodyEndIndex) + printContents.substring(tbodyEndIndex);
+            } else {
+                // If tbody not found, append to the end of the table
+                var tableEndIndex = printContents.lastIndexOf('</table>');
+                 if (tableEndIndex !== -1) {
+                    printContents = printContents.substring(0, tableEndIndex) + '<tbody>' + '</tbody>' + printContents.substring(tableEndIndex);
+                 } else {
+                    // Fallback: just append to the end of the content
+                    printContents += footerRow;
+                 }
+            }
+
+
+            document.body.innerHTML = header + printContents;
+
+            window.print();
+
+            document.body.innerHTML = originalContents;
+            // Reload the page to restore event listeners and functionality
+            window.location.reload();
+        });
+
+        document.getElementById('exportExcel').addEventListener('click', function() {
+            var table = document.getElementById('studentsTable');
+            var html = table.outerHTML;
+            var url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'students_table.xls';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+    </script>
+</body>
+</html>

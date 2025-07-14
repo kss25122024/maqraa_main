@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>صفحة الطالب</title>
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <style>
+        body {
+            direction: rtl;
+            text-align: right;
+            background-color: #dcd3c1;
+        }
+        
+        .header,
+        .footer {
+            background-color: #dcd3c1;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .student-info img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 50%;
+        }
+        
+        .table th,
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        
+        <div class="header d-flex justify-content-between align-items-center">
+            <div>
+                <h1>مرحباً: {{ user.get_full_name }} </h1>
+            </div>
+            <div>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary">تسجيل الخروج</button>
+                </form>
+            </div>
+        </div>
+        
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="card mb-4 text-center">
+                    <div class="card-body">
+
+                        <h5 class="card-title ">معلومات الطالب</h5>
+
+                        <p><strong>اسم المسار:</strong> {{ student.group.course.name }}</p>
+                        <p><strong>اسم الحلقة:</strong> {{ student.group.name }}</p>
+                        <p><strong>وقت الحلقة:</strong> {{ student.group.time }}</p>
+                        <p><strong>اسم المدرس:</strong> {{ student.group.teacher }}</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="container">
+            <br>
+            <h2 class="text-center">جدول خطة الاسبوع</h2>
+            <br>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th rowspan="2">المهمة</th>
+                        <th colspan="3">السابق</th>
+                        <th colspan="3">الهدف</th>
+                    </tr>
+                    <tr>
+                        <th>الفئة</th>
+                        <th>سورة</th>
+                        <th>آية</th>
+                        <th>الفئة</th>
+                        <th>سورة</th>
+                        <th>آية</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>الحفظ</td>
+                        <td>
+                            <select class="form-control" onchange="updateSurahOptions(this, 0,'plan')">
+                                <option value="1">فئة المبتدئين </option>
+                                <option value="2"> فئة ثلاثة أجزاء</option>
+                                <option value="3"> فئة خمسة أجزاء</option>
+                                <option value="4"> فئة عشرة أجزاء</option>
+                                <option value="5"> فئة خمسة عشر جزء</option>
+                                <option value="6"> فئة عشرون جزء</option>
+                                <option value="7"> فئة خمسة وعشرون جزء</option>
+    
+                              </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="surah-options-0,'plan'" onchange="updateAyatOptions(this, 0,'plan')">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="ayat-options-0,'plan'">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control" onchange="updateSurahOptions(this, 1,'plan')">
+                                <option value="1">فئة المبتدئين </option>
+                                <option value="2"> فئة ثلاثة أجزاء</option>
+                                <option value="3"> فئة خمسة أجزاء</option>
+                                <option value="4"> فئة عشرة أجزاء</option>
+                                <option value="5"> فئة خمسة عشر جزء</option>
+                                <option value="6"> فئة عشرون جزء</option>
+                                <option value="7"> فئة خمسة وعشرون جزء</option>
+    
+                              </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="surah-options-1,'plan'" onchange="updateAyatOptions(this, 1,'plan')">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="ayat-options-1,'plan'">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>المراجعة</td>
+                        <td>
+                            <select class="form-control" onchange="updateSurahOptions(this,2,'plan')">
+                                <option value="1">فئة المبتدئين </option>
+                                <option value="2"> فئة ثلاثة أجزاء</option>
+                                <option value="3"> فئة خمسة أجزاء</option>
+                                <option value="4"> فئة عشرة أجزاء</option>
+                                <option value="5"> فئة خمسة عشر جزء</option>
+                                <option value="6"> فئة عشرون جزء</option>
+                                <option value="7"> فئة خمسة وعشرون جزء</option>
+    
+                              </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="surah-options-2,'plan'" onchange="updateAyatOptions(this,2,'plan')">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="ayat-options-2,'plan'">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control" onchange="updateSurahOptions(this,3,'plan')">
+                                <option value="1">فئة المبتدئين </option>
+                                <option value="2"> فئة ثلاثة أجزاء</option>
+                                <option value="3"> فئة خمسة أجزاء</option>
+                                <option value="4"> فئة عشرة أجزاء</option>
+                                <option value="5"> فئة خمسة عشر جزء</option>
+                                <option value="6"> فئة عشرون جزء</option>
+                                <option value="7"> فئة خمسة وعشرون جزء</option>
+    
+                              </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="surah-options-3,'plan'" onchange="updateAyatOptions(this,3,'plan')">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="ayat-options-3,'plan'">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>التلقين</td>
+                        <td>
+                            <select class="form-control" onchange="updateSurahOptions(this,4,'plan')">
+                                <option value="1">فئة المبتدئين </option>
+                                <option value="2"> فئة ثلاثة أجزاء</option>
+                                <option value="3"> فئة خمسة أجزاء</option>
+                                <option value="4"> فئة عشرة أجزاء</option>
+                                <option value="5"> فئة خمسة عشر جزء</option>
+                                <option value="6"> فئة عشرون جزء</option>
+                                <option value="7"> فئة خمسة وعشرون جزء</option>
+    
+                              </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="surah-options-4,'plan'" onchange="updateAyatOptions(this,4,'plan')">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="ayat-options-4,'plan'">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control" onchange="updateSurahOptions(this,5,'plan')">
+                                <option value="1">فئة المبتدئين </option>
+                                <option value="2"> فئة ثلاثة أجزاء</option>
+                                <option value="3"> فئة خمسة أجزاء</option>
+                                <option value="4"> فئة عشرة أجزاء</option>
+                                <option value="5"> فئة خمسة عشر جزء</option>
+                                <option value="6"> فئة عشرون جزء</option>
+                                <option value="7"> فئة خمسة وعشرون جزء</option>
+    
+                              </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="surah-options-5,'plan'" onchange="updateAyatOptions(this,5,'plan')">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control" id="ayat-options-5,'plan'">
+                                <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <br>
+        <br>
+        <h5 class="text-ceter">التقييم اليومي</h5>
+        <br>
+        <table class="table table-bordered ">
+            <thead>
+                <tr>
+                    <th>المهمة </th>
+                    <th colspan=" 3 ">الحفظ السابق</th>
+                    <th colspan="3 ">إلى</th>
+                    <th>عدد الآيات</th>
+                    <th colspan="2 ">الصفحات</th>
+                    <th>الدرجة</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>الحفظ</td>
+                    <td>
+                        <select class="form-control" onchange="updateSurahOptions(this,0,'daily')">
+                            <option value="1">فئة المبتدئين </option>
+                            <option value="2"> فئة ثلاثة أجزاء</option>
+                            <option value="3"> فئة خمسة أجزاء</option>
+                            <option value="4"> فئة عشرة أجزاء</option>
+                            <option value="5"> فئة خمسة عشر جزء</option>
+                            <option value="6"> فئة عشرون جزء</option>
+                            <option value="7"> فئة خمسة وعشرون جزء</option>
+
+                          </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="surah-options-0,'daily'" onchange="updateAyatOptions(this,0,'daily')">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="ayat-options-0,'daily'">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" onchange="updateSurahOptions(this,1,'daily')">
+                            <option value="1">فئة المبتدئين </option>
+                            <option value="2"> فئة ثلاثة أجزاء</option>
+                            <option value="3"> فئة خمسة أجزاء</option>
+                            <option value="4"> فئة عشرة أجزاء</option>
+                            <option value="5"> فئة خمسة عشر جزء</option>
+                            <option value="6"> فئة عشرون جزء</option>
+                            <option value="7"> فئة خمسة وعشرون جزء</option>
+
+                          </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="surah-options-1,'daily'" onchange="updateAyatOptions(this,1,'daily')">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="ayat-options-1,'daily'">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                        </select>
+                    </td>
+                    <td><input type="text " class="form-control " placeholder="عدد الايات "></td>
+                    <td>
+                        <select class="form-control">
+                            <option >0</option>
+                            <option >0.25</option>
+                            <option >0.5</option>
+                            <option >0.75</option>
+                          </select>
+                    </td>
+                    <td><input type="number " class="form-control " placeholder="عدد الصفحات "></td>
+                    <td>
+                        <select class="form-control">
+                            <option >0</option>
+                            <option >1</option>
+                            <option >2</option>
+                            <option >3</option>
+                            <option >4</option>
+                            <option >5</option>
+                            <option >6</option>
+                            <option >7</option>
+                            <option >8</option>
+                            <option >9</option>
+                            <option >10</option>
+                          </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>المراجعة</td>
+                    <td>
+                        <select class="form-control" onchange="updateSurahOptions(this,2,'daily')">
+                            <option value="1">فئة المبتدئين </option>
+                            <option value="2"> فئة ثلاثة أجزاء</option>
+                            <option value="3"> فئة خمسة أجزاء</option>
+                            <option value="4"> فئة عشرة أجزاء</option>
+                            <option value="5"> فئة خمسة عشر جزء</option>
+                            <option value="6"> فئة عشرون جزء</option>
+                            <option value="7"> فئة خمسة وعشرون جزء</option>
+
+                          </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="surah-options-2,'daily'" onchange="updateAyatOptions(this,2,'daily')">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="ayat-options-2,'daily'">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" onchange="updateSurahOptions(this,3,'daily')">
+                            <option value="1">فئة المبتدئين </option>
+                            <option value="2"> فئة ثلاثة أجزاء</option>
+                            <option value="3"> فئة خمسة أجزاء</option>
+                            <option value="4"> فئة عشرة أجزاء</option>
+                            <option value="5"> فئة خمسة عشر جزء</option>
+                            <option value="6"> فئة عشرون جزء</option>
+                            <option value="7"> فئة خمسة وعشرون جزء</option>
+
+                          </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="surah-options-3,'daily'" onchange="updateAyatOptions(this,3,'daily')">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="ayat-options-3,'daily'">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                        </select>
+                    </td>
+                    <td><input type="text " class="form-control " placeholder="عدد الايات "></td>
+                    <td>
+                        <select class="form-control">
+                            <option >0</option>
+                            <option >0.25</option>
+                            <option >0.5</option>
+                            <option >0.75</option>
+                          </select>
+                    </td>
+                    <td><input type="number " class="form-control " placeholder="عدد الصفحات "></td>
+                    <td>
+                        <select class="form-control">
+                            <option >0</option>
+                            <option >1</option>
+                            <option >2</option>
+                            <option >3</option>
+                            <option >4</option>
+                            <option >5</option>
+                            <option >6</option>
+                            <option >7</option>
+                            <option >8</option>
+                            <option >9</option>
+                            <option >10</option>
+                          </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>التلقين</td>
+                    <td>
+                        <select class="form-control" onchange="updateSurahOptions(this, 4,'daily')">
+                            <option value="1">فئة المبتدئين </option>
+                            <option value="2"> فئة ثلاثة أجزاء</option>
+                            <option value="3"> فئة خمسة أجزاء</option>
+                            <option value="4"> فئة عشرة أجزاء</option>
+                            <option value="5"> فئة خمسة عشر جزء</option>
+                            <option value="6"> فئة عشرون جزء</option>
+                            <option value="7"> فئة خمسة وعشرون جزء</option>
+
+                          </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="surah-options-4,'daily'" onchange="updateAyatOptions(this, 4,'daily')">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="ayat-options-4,'daily'">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" onchange="updateSurahOptions(this, 5,'daily')">
+                            <option value="1">فئة المبتدئين </option>
+                            <option value="2"> فئة ثلاثة أجزاء</option>
+                            <option value="3"> فئة خمسة أجزاء</option>
+                            <option value="4"> فئة عشرة أجزاء</option>
+                            <option value="5"> فئة خمسة عشر جزء</option>
+                            <option value="6"> فئة عشرون جزء</option>
+                            <option value="7"> فئة خمسة وعشرون جزء</option>
+
+                          </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="surah-options-5,'daily'" onchange="updateAyatOptions(this, 5,'daily')">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على الجزء المحدد -->
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="ayat-options-5,'daily'">
+                            <!-- سيتم تحديث هذه الخيارات بناءً على السورة المحددة -->
+                        </select>
+                    </td>
+                    <td><input type="text " class="form-control " placeholder="عدد الايات "></td>
+                    <td>
+                        <select class="form-control">
+                            <option >0</option>
+                            <option >0.25</option>
+                            <option >0.5</option>
+                            <option >0.75</option>
+                          </select>
+                    </td>
+                    <td><input type="number " class="form-control " placeholder="عدد الصفحات "></td>
+                    <td>
+                        <select class="form-control">
+                            <option >0</option>
+                            <option >1</option>
+                            <option >2</option>
+                            <option >3</option>
+                            <option >4</option>
+                            <option >5</option>
+                            <option >6</option>
+                            <option >7</option>
+                            <option >8</option>
+                            <option >9</option>
+                            <option >10</option>
+                          </select>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div  class=" w-100 h-250px bg-light m-1"   >
+                <h3> مضمون المحاضرة </h3>
+                <p><br><br><br><br><br><br><br><br><br><br><br><br></p>
+            </div>
+            </div>
+            <div class="col-md-8">
+                <h3>نافذة المحاضرة الأسبوعية</h3>
+                <iframe src="video_url" width="100%" height="300" frameborder="0" allowfullscreen></iframe>
+               
+                <div class="text-center mt-3">
+                    <a href="quastions.html" class="btn " style="background-color:#b5b1a9;">سؤال الاسبوع </a>
+                </div>
+            </div>
+            
+            </div>
+            
+        </div>
+
+        <div class="row mt-4 bg-light">
+            <div class="col-6">
+
+                        <h3>نافذة التواصل</h3>
+                        <div class="container mt-5">
+                            <button class="btn btn-primary" id="chat-teacher-btn">تواصل مع الأستاذ</button>
+                            <button class="btn btn-secondary" id="chat-admin-btn">تواصل مع الأدمن</button>
+                        </div>
+                        
+                        <div class="chat-window" id="chat-teacher-window">
+                            <div class="chat-header">
+                                <span>دردشة مع الأستاذ</span>
+                            </div>
+                            <div class="chat-body" id="chat-teacher-body">
+                                <!-- رسائل الدردشة ستظهر هنا -->
+                            </div>
+                            <div class="chat-footer">
+                                <input type="text" class="form-control" id="chat-teacher-input" placeholder="اكتب رسالتك...">
+                                <button class="btn btn-success" id="chat-teacher-send-btn">إرسال</button>
+                            </div>
+                        </div>
+                    
+                        <div class="chat-window" id="chat-admin-window">
+                            <div class="chat-header">
+                                <span>دردشة مع الأدمن</span>
+                            </div>
+                            <div class="chat-body" id="chat-admin-body">
+                                <!-- رسائل الدردشة ستظهر هنا -->
+                            </div>
+                            <div class="chat-footer">
+                                <input type="text" class="form-control" id="chat-admin-input" placeholder="اكتب رسالتك...">
+                                <button class="btn btn-success" id="chat-admin-send-btn">إرسال</button>
+                            </div>
+                        </div>
+                    
+                        <script>
+                            document.getElementById('chat-teacher-btn').addEventListener('click', function() {
+                                document.getElementById('chat-teacher-window').style.display = 'block';
+                            });
+                    
+                            document.getElementById('chat-admin-btn').addEventListener('click', function() {
+                                document.getElementById('chat-admin-window').style.display = 'block';
+                            });
+                    
+                            document.addEventListener('click', function(event) {
+                                const chatTeacherWindow = document.getElementById('chat-teacher-window');
+                                const chatAdminWindow = document.getElementById('chat-admin-window');
+                    
+                                if (chatTeacherWindow.style.display === 'block' && !chatTeacherWindow.contains(event.target) && event.target.id !== 'chat-teacher-btn') {
+                                    chatTeacherWindow.style.display = 'none';
+                                }
+                    
+                                if (chatAdminWindow.style.display === 'block' && !chatAdminWindow.contains(event.target) && event.target.id !== 'chat-admin-btn') {
+                                    chatAdminWindow.style.display = 'none';
+                                }
+                            });
+                    
+                            document.getElementById('chat-teacher-send-btn').addEventListener('click', function() {
+                                const chatInput = document.getElementById('chat-teacher-input');
+                                const chatBody = document.getElementById('chat-teacher-body');
+                                const message = chatInput.value;
+                    
+                                if (message.trim() !== '') {
+                                    const messageElement = document.createElement('div');
+                                    messageElement.textContent = message;
+                                    chatBody.appendChild(messageElement);
+                                    chatInput.value = '';
+                                }
+                            });
+                    
+                            document.getElementById('chat-admin-send-btn').addEventListener('click', function() {
+                                const chatInput = document.getElementById('chat-admin-input');
+                                const chatBody = document.getElementById('chat-admin-body');
+                                const message = chatInput.value;
+                    
+                                if (message.trim() !== '') {
+                                    const messageElement = document.createElement('div');
+                                    messageElement.textContent = message;
+                                    chatBody.appendChild(messageElement);
+                                    chatInput.value = '';
+                                }
+                            });
+                        </script>
+                        
+            </div>
+            
+            <div class="col-6">
+                <h5>قائمة الروابط</h5>
+                <ul class="list-group mb-4 ">
+                    <li class="list-group-item "><a href="# ">رابط 1</a></li>
+                    <li class="list-group-item "><a href="# ">رابط 2</a></li>
+                    <li class="list-group-item "><a href="# ">رابط 3</a></li>
+                </ul>
+            </div>
+        </div>
+
+    <script>
+        const juzSurahs = {
+            1: ["الفاتحة", "الناس", "الفلق", "الإخلاص", "المسد", "النصر", "الكافرون", "الكوثر", "الماعون", "قريش", "الفيل", "الهمزة", "العصر", "التكاثر", "القارعة", "العاديات", "الزلزلة", "البينة", "القدر", "العلق", "التين", "الشرح", "الضحى", "الليل", "الشمس", "البلد", "الفجر", "الغاشية", "الأعلى", "الطارق", "البروج", "الإنشقاق", "المطففين", "الانفطار", "التكوير", "عبس", "النازعات", "النبأ"],
+            2: ["المرسلات", "الإنسان", "القيامة", "المدثر", "المزمل", "الجن", "نوح", "المعارج", "الحاقة", "القلم", "الملك", "التحريم", "الطلاق", "التغابن", "المنافقون", "الجمعة", "الصف", "الممتحنة", "الحشر", "المجادلة"],
+            3: ["الحديد", "الواقعة", "الرحمن", "القمر", "النجم", "الطور", "الذاريات", "ق", "الحجرات", "الفتح", "محمد", "الأحقاف"],
+            4: ["الجاثية", "الدخان", "الزخرف", "الشورى", "فصلت", "غافر", "الزمر", "ص", "الصافات", "يس", "فاطر", "سبأ", "الأحزاب", "السجدة", "لقمان", "الروم"],
+            5: ["العنكبوت", "القصص", "النمل", "الشعراء", "الفرقان", "النور", "المؤمنون", "الحج", "الأنبياء", "طه", "مريم"],
+            6: ["الكهف", "الإسراء", "النحل", "الحجر", "إبراهيم", "الرعد", "يوسف", "هود", "يونس"],
+            7: ["التوبة", "الأنفال", "الأعراف", "الأنعام", "المائدة", "النساء", "آل عمران", "البقرة"],
+            // أضف باقي الأجزاء والسور هنا
+        };
+
+        const surahAyatCounts = {
+            "الفاتحة ": 7,
+            "النساء ": 176,
+            "المائدة ": 120,
+            "الأنعام ": 165,
+            "الأعراف ": 206,
+            "الأنفال ": 75,
+            "التوبة ": 129,
+            "يونس ": 109,
+            "هود ": 123,
+            "يوسف ": 111,
+            "الرعد ": 43,
+            "إبراهيم ": 52,
+            "الحجر ": 99,
+            "النحل ": 128,
+            "الإسراء ": 111,
+            "الكهف ": 110,
+            "مريم ": 98,
+            "طه ": 135,
+            "الأنبياء ": 112,
+            "الحج ": 78,
+            "المؤمنون ": 118,
+            "النور ": 64,
+            "الفرقان ": 77,
+            "الشعراء ": 227,
+            "النمل ": 93,
+            "القصص ": 88,
+            "العنكبوت ": 69,
+            "الروم ": 60,
+            "لقمان ": 34,
+            "السجدة ": 30,
+            "الأحزاب ": 73,
+            "سبأ ": 54,
+            "فاطر ": 45,
+            "يس ": 83,
+            "الصافات ": 182,
+            "ص ": 88,
+            "الزمر ": 75,
+            "غافر ": 85,
+            "فصلت ": 54,
+            "الشورى ": 53,
+            "الزخرف ": 89,
+            "الدخان ": 59,
+            "الجاثية ": 37,
+            "الأحقاف ": 35,
+            "محمد ": 38,
+            "الفتح ": 29,
+            "الحجرات ": 18,
+            "ق ": 45,
+            "الذاريات ": 60,
+            "الطور ": 49,
+            "النجم ": 62,
+            "القمر ": 55,
+            "الرحمن ": 78,
+            "الواقعة ": 96,
+            "الحديد ": 29,
+            "المجادلة ": 22,
+            "الحشر ": 24,
+            "الممتحنة ": 13,
+            "الصف ": 14,
+            "الجمعة ": 11,
+            "المنافقون ": 11,
+            "التغابن ": 18,
+            "الطلاق ": 12,
+            "التحريم ": 12,
+            "الملك ": 30,
+            "القلم ": 52,
+            "الحاقة ": 52,
+            "المعارج ": 44,
+            "نوح ": 28,
+            "الجن ": 28,
+            "المزمل ": 20,
+            "المدثر ": 56,
+            "القيامة ": 40,
+            "الإنسان ": 31,
+            "المرسلات ": 50,
+            "النبأ ": 40,
+            "النازعات ": 46,
+            "عبس ": 42,
+            "التكوير ": 29,
+            "الانفطار ": 19,
+            "المطففين ": 36,
+            "الانشقاق ": 25,
+            "البروج ": 22,
+            "الطارق ": 17,
+            "الأعلى ": 19,
+            "الغاشية ": 26,
+            "الفجر ": 30,
+            "البلد ": 20,
+            "الشمس ": 15,
+            "الليل ": 21,
+            "الضحى ": 11,
+            "الشرح ": 8,
+            "التين ": 8,
+            "العلق ": 19,
+            "القدر ": 5,
+            "البينة ": 8,
+            "الزلزلة ": 8,
+            "العاديات ": 11,
+            "القارعة ": 11,
+            "التكاثر ": 8,
+            "العصر ": 3,
+            "الهمزة ": 9,
+            "الفيل ": 5,
+            "قريش ": 4,
+            "الماعون ": 7,
+            "الكوثر ": 3,
+            "الكافرون ": 6,
+            "النصر ": 3,
+            "المسد ": 5,
+            "الإخلاص ": 4,
+            "الفلق ": 5,
+            "الناس ": 6,
+            "البقرة ": 286,
+            "آل عمران ": 200,
+            // أضف باقي السور وعدد آياتها هنا
+        };
+
+        function updateSurahOptions(juzSelect, rowIndex) {
+            const juz = juzSelect.value;
+            const surahSelect = document.getElementById(`surah-options-${rowIndex}`);
+            surahSelect.innerHTML = " ";
+
+            juzSurahs[juz].forEach(surah => {
+                const option = document.createElement("option ");
+                option.value = surah;
+                option.text = surah;
+                surahSelect.appendChild(option);
+            });
+
+            // تحديث خيارات الآيات لأول سورة في الجزء
+            updateAyatOptions(surahSelect, rowIndex);
+        }
+
+        function updateAyatOptions(surahSelect, rowIndex) {
+            const surah = surahSelect.value;
+            const ayatCount = surahAyatCounts[surah];
+            const ayatSelect = document.getElementById(`ayat-options-${rowIndex}`);
+            ayatSelect.innerHTML = " ";
+
+            for (let i = 1; i <= ayatCount; i++) {
+                const option = document.createElement("option ");
+                option.value = i;
+                option.text = i;
+                ayatSelect.appendChild(option);
+            }
+        }
+
+        // تهيئة الخيارات عند تحميل الصفحة
+        document.addEventListener("DOMContentLoaded ", function() {
+            const juzSelects = document.querySelectorAll('select[onchange^="updateSurahOptions "]');
+            juzSelects.forEach((select, index) => {
+                updateSurahOptions(select, index);
+            });
+        });
+    </script>
+    <script src="js/jquery-3.7.1.js "></script>
+    <script src="js/popper.min.js "></script>
+    <script src="js/bootstrap.js "></script>
+</body>
+
+</html>
