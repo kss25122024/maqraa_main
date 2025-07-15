@@ -141,25 +141,12 @@
                 "الفاتحة": 7, "البقرة": 286, "آل عمران": 200, "النساء": 176, "المائدة": 120, "الأنعام": 165, "الأعراف": 206, "الأنفال": 75, "التوبة": 129, "يونس": 109, "هود": 123, "يوسف": 111, "الرعد": 43, "إبراهيم": 52, "الحجر": 99, "النحل": 128, "الإسراء": 111, "الكهف": 110, "مريم": 98, "طه": 135, "الأنبياء": 112, "الحج": 78, "المؤمنون": 118, "النور": 64, "الفرقان": 77, "الشعراء": 227, "النمل": 93, "القصص": 88, "العنكبوت": 69, "الروم": 60, "لقمان": 34, "السجدة": 30, "الأحزاب": 73, "سبأ": 54, "فاطر": 45, "يس": 83, "الصافات": 182, "ص": 88, "الزمر": 75, "غافر": 85, "فصلت": 54, "الشورى": 53, "الزخرف": 89, "الدخان": 59, "الجاثية": 37, "الأحقاف": 35, "محمد": 38, "الفتح": 29, "الحجرات": 18, "ق": 45, "الذاريات": 60, "الطور": 49, "النجم": 62, "القمر": 55, "الرحمن": 78, "الواقعة": 96, "الحديد": 29, "المجادلة": 22, "الحشر": 24, "الممتحنة": 13, "الصف": 14, "الجمعة": 11, "المنافقون": 11, "التغابن": 18, "الطلاق": 12, "التحريم": 12,             "الملك": 30, "القلم": 52, "الحاقة": 52, "المعارج": 44, "نوح": 28, "الجن": 28, "المزمل": 20, "المدثر": 56, "القيامة": 40, "الإنسان": 31, "المرسلات": 50, "النبأ": 40, "النازعات": 46, "عبس": 42, "التكوير": 29, "الانفطار": 19, "المطففين": 36, "الانشقاق": 25, "البروج": 22, "الطارق": 17, "الأعلى": 19, "الغاشية": 26, "الفجر": 30, "البلد": 20, "الشمس": 15, "الليل": 21, "الضحى": 11, "الشرح": 8, "التين": 8, "العلق": 19, "القدر": 5, "البينة": 8, "الزلزلة": 8, "العاديات": 11, "القارعة": 11, "التكاثر": 8, "العصر": 3, "الهمزة": 9, "الفيل": 5, "قريش": 4, "الماعون": 7, "الكوثر": 3, "الكافرون": 6, "النصر": 3, "المسد": 5, "الإخلاص": 4, "الفلق": 5, "الناس": 6
             };
 
+            
+
             function updateSurahOptions(category) {
-                console.log("updateSurahOptions called with category:", category); // Added logging
-                const options = category_surahs[String(category)] || [];
-                console.log("Options for category:", category, options); // Added logging
-                // Clear existing options using remove()
-                while (previousSurahSelect.options.length > 0) {
-                    previousSurahSelect.remove(0);
-                }
-                while (currentSurahSelect.options.length > 0) {
-                    currentSurahSelect.remove(0);
-                }
-
-                // Add the default "اختر سورة" option
-                const defaultSurahOption = document.createElement("option");
-                defaultSurahOption.value = "";
-                defaultSurahOption.text = "اختر سورة";
-                previousSurahSelect.appendChild(defaultSurahOption.cloneNode(true));
-                currentSurahSelect.appendChild(defaultSurahOption);
-
+                const options = category_surahs[category] || [];
+                previousSurahSelect.innerHTML = '<option value="">اختر سورة</option>';
+                currentSurahSelect.innerHTML = '<option value="">اختر سورة</option>';
                 options.forEach(surah => {
                     const optionElement = document.createElement("option");
                     optionElement.value = surah;
@@ -167,29 +154,14 @@
                     previousSurahSelect.appendChild(optionElement.cloneNode(true));
                     currentSurahSelect.appendChild(optionElement);
                 });
-                console.log(`Previous Surah Select options count after update: ${previousSurahSelect.options.length}`); // Added logging
-                console.log(`Current Surah Select options count after update: ${currentSurahSelect.options.length}`); // Added logging
-
-
-                // If there are surahs, select the first one as default and update ayat options
-                if (options.length > 0) {
-                    const firstSurah = options[0];
-                    previousSurahSelect.value = firstSurah;
-                    currentSurahSelect.value = firstSurah;
-                    updateAyatOptions(firstSurah, previousAyatSelect);
-                    updateAyatOptions(firstSurah, currentAyatSelect);
-                } else {
-                    // If there are no surahs, clear ayah options
-                    previousAyatSelect.innerHTML = '<option value="">اختر آية</option>';
-                    currentAyatSelect.innerHTML = '<option value="">اختر آية</option>';
-                }
+                // Reset ayah selections when surah options change
+                previousAyatSelect.innerHTML = '<option value="">اختر آية</option>';
+                currentAyatSelect.innerHTML = '<option value="">اختر آية</option>';
                 return options; // Return the options
             }
 
            function updateAyatOptions(surah, ayatSelect) {
-                console.log("updateAyatOptions called for surah:", surah, "in select:", ayatSelect.id); // Added logging
                 const ayatCount = ayatCounts[surah] || 0;
-                console.log("Ayat count for surah", surah, ":", ayatCount); // Added logging
                 ayatSelect.innerHTML = '<option value="">اختر آية</option>';
                 for (let i = 1; i <= ayatCount; i++) {
                     const optionElement = document.createElement("option");
@@ -197,60 +169,35 @@
                     optionElement.text = i;
                     ayatSelect.appendChild(optionElement);
                 }
-                 console.log(`Ayat Select options count after update: ${ayatSelect.options.length}`); // Added logging
             }
 
             talqeenTaskSelect.addEventListener('change', function () {
                 const category = talqeenTaskSelect.value;
-                console.log("Category changed to:", `"${category}"`); // Added logging with delimiters
-               // Add a small delay to potentially allow other scripts to run first
-               setTimeout(function() {
-                   const surahs = updateSurahOptions(category);
-                   // If there are surahs, select the first one as default and update ayat options
-                   if (surahs.length > 0) {
-                       const firstSurah = surahs[0];
-                       previousSurahSelect.value = firstSurah;
-                       currentSurahSelect.value = firstSurah;
-                       updateAyatOptions(firstSurah, previousAyatSelect);
-                       updateAyatOptions(firstSurah, currentAyatSelect);
-                   } else {
-                        // If there are no surahs, clear ayah options
-                       previousAyatSelect.innerHTML = '<option value="">اختر آية</option>';
-                       currentAyatSelect.innerHTML = '<option value="">اختر آية</option>';
-                   }
-               }, 500); // Increased delay to 500ms
-           });
+                updateSurahOptions(category);
+            });
 
             previousSurahSelect.addEventListener('change', function () {
                 const selectedSurah = previousSurahSelect.value;
-                console.log("Previous Surah changed to:", selectedSurah); // Added logging
                 updateAyatOptions(selectedSurah, previousAyatSelect);
             });
 
             currentSurahSelect.addEventListener('change', function () {
                 const selectedSurah = currentSurahSelect.value;
-                console.log("Current Surah changed to:", selectedSurah); // Added logging
-                updateAyatOptions(selectedSurah, currentAyatSelect);
+                updateAyahOptions(selectedSurah, currentAyatSelect); // Corrected function call
             });
 
            // Set default category to '1' and load initial surahs and ayahs on page load
             // '1' corresponds to "المبتدئين" based on the category_surahs structure
-            // Set default category to '1' and load initial surahs and ayahs on page load with a delay
-            // '1' corresponds to "المبتدئين" based on the category_surahs structure
-            setTimeout(function() {
-                talqeenTaskSelect.value = '1';
-                console.log("Setting default category to '1' on page load with delay."); // Added logging
-                const initialSurahs = updateSurahOptions('1'); // Load surahs for the default category
+            talqeenTaskSelect.value = '1';
+            const initialSurahs = updateSurahOptions('1'); // Load surahs for the default category
 
-                if (initialSurahs.length > 0) {
-                    const firstSurah = initialSurahs[0];
-                    previousSurahSelect.value = firstSurah;
-                    currentSurahSelect.value = firstSurah;
-                    console.log("Setting default surahs to:", firstSurah); // Added logging
-                    updateAyatOptions(firstSurah, previousAyatSelect); // Load ayahs for the first surah in previous
-                    updateAyatOptions(firstSurah, currentAyatSelect); // Load ayahs for the first surah in current
-                }
-            }, 300); // Added delay to initial load
+            if (initialSurahs.length > 0) {
+                const firstSurah = initialSurahs[0];
+                previousSurahSelect.value = firstSurah;
+                currentSurahSelect.value = firstSurah;
+                updateAyatOptions(firstSurah, previousAyatSelect); // Load ayahs for the first surah in previous
+                updateAyatOptions(firstSurah, currentAyatSelect); // Load ayahs for the first surah in current
+            }
 
 
              const form = document.getElementById('talqeenForm');
@@ -260,6 +207,7 @@
                 const data = {};
                 formData.forEach((value, key) => {
                     data[key] = value;
+                    console.log(`Key: ${key}, Value: ${value}`); // Add this line to log each key-value pair
                 });
 
             
@@ -267,7 +215,11 @@
           
 
 
+
+
                 
+                console.log("Sending Data:", data);  // طباعة البيانات للتحقق منها
+
                 fetch(form.action, {
                     method: 'POST',
                     headers: {

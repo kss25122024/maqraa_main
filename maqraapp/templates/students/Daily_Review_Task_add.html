@@ -120,10 +120,6 @@
     <script src="{% static 'js/bootstrap.js' %}"></script>
     <script src="{% static 'js/7.js' %}"></script>
     <script>
-            
-
-
-
         document.addEventListener('DOMContentLoaded', function() {
             const reviewTaskSelect = document.getElementById("id_ReviewTask");
             const previousSurahSelect = document.getElementById("id_previous_surah");
@@ -158,39 +154,15 @@
                     previousSurahSelect.appendChild(optionElement.cloneNode(true));
                     currentSurahSelect.appendChild(optionElement);
                 });
-                // Ensure the default option is selected after repopulating
-                previousSurahSelect.selectedIndex = 0;
-                currentSurahSelect.selectedIndex = 0;
-
-                // If there are surahs, select the first one as default and update ayat options
-                if (options.length > 0) {
-                    const firstSurah = options[0];
-                    previousSurahSelect.value = firstSurah;
-                    currentSurahSelect.value = firstSurah;
-                    updateAyatOptions(firstSurah, previousAyatSelect);
-                    updateAyatOptions(firstSurah, currentAyatSelect);
-                } else {
-                    // If there are no surahs, clear ayah options
-                    previousAyatSelect.innerHTML = '<option value="">اختر آية</option>';
-                    currentAyatSelect.innerHTML = '<option value="">اختر آية</option>';
-                }
+                // Reset ayah selections when surah options change
+                previousAyatSelect.innerHTML = '<option value="">اختر آية</option>';
+                currentAyatSelect.innerHTML = '<option value="">اختر آية</option>';
                 return options; // Return the options
             }
 
             function updateAyatOptions(surah, ayatSelect) {
-                console.log("Updating ayat options for surah:", surah, "in select:", ayatSelect.id); // Add logging
                 const ayatCount = ayatCounts[surah] || 0;
-                console.log("Ayat count for surah", surah, ":", ayatCount); // Add logging
-                // Clear existing options
-                while (ayatSelect.options.length > 0) {
-                    ayatSelect.remove(0);
-                }
-                // Add the default "اختر آية" option
-                const defaultOption = document.createElement("option");
-                defaultOption.value = "";
-                defaultOption.text = "اختر آية";
-                ayatSelect.appendChild(defaultOption);
-    
+                ayatSelect.innerHTML = '<option value="">اختر آية</option>';
                 for (let i = 1; i <= ayatCount; i++) {
                     const optionElement = document.createElement("option");
                     optionElement.value = i;
@@ -204,38 +176,18 @@
             reviewTaskSelect.addEventListener('change', function () {
                 
                 const category = reviewTaskSelect.value;
-                // Add a small delay to potentially allow other scripts to run first
-                setTimeout(function() {
-                    const surahs = updateSurahOptions(category);
-                      if (surahs.length > 0) {
-                const firstSurah = surahs[0];
-                previousSurahSelect.value = firstSurah;
-                currentSurahSelect.value = firstSurah;
-                updateAyatOptions(firstSurah, previousAyatSelect);
-                updateAyatOptions(firstSurah, currentAyatSelect)
-                 }
-                }, 100); // 100ms delay
+                updateSurahOptions(category);
             });
 
-
-               
-           
-
              previousSurahSelect.addEventListener('change', function () {
-                 const selectedSurah = previousSurahSelect.value;
-                 // Add a small delay
-                 setTimeout(function() {
-                     updateAyatOptions(selectedSurah, previousAyatSelect);
-                 }, 50); // 50ms delay
-             });
-     
-             currentSurahSelect.addEventListener('change', function () {
-                 const selectedSurah = currentSurahSelect.value;
-                 // Add a small delay
-                 setTimeout(function() {
-                     updateAyatOptions(selectedSurah, currentAyatSelect);
-                 }, 50); // 50ms delay
-             });
+                const selectedSurah = previousSurahSelect.value;
+                updateAyatOptions(selectedSurah, previousAyatSelect);
+            });
+
+            currentSurahSelect.addEventListener('change', function () {
+                const selectedSurah = currentSurahSelect.value;
+                updateAyatOptions(selectedSurah, currentAyatSelect);
+            });
 
            // Set default category to '1' and load initial surahs and ayahs on page load
             // '1' corresponds to "المبتدئين" based on the category_surahs structure
